@@ -22,6 +22,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 LINUX_VERSION = "5.10.10"
 
 SRCBRANCH = "seco/develop/v5.10.10"
-SRCREV = "f6e1a93ee27713241d0cef4a9d6180826306e20c"
+SRCREV = "e693c0f58a500372c211b2b32cdf70ba57841003"
 
 COMPATIBLE_MACHINE = "(mxs|mx5|mx6|mx8|vf|use-mainline-bsp)"

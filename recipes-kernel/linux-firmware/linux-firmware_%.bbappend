@@ -20,5 +20,3 @@ FILES_${PN}-bcm43455_append_seco-imx8mm-c61 = " \
   ${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.bin \
 "
 RDEPENDS_${PN}-bcm43455_remove_seco-imx8mm-c61 = " ${PN}-cypress-license "
-
-RRECOMMENDS_${PN}-bcm43455_append_seco-imx8mm-c61 += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'wifi-suspend', '', d)}"

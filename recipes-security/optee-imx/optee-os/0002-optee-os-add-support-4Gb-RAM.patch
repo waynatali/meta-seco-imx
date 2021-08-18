@@ -1,0 +1,53 @@
+diff --git a/core/arch/arm/plat-imx/conf.mk b/core/arch/arm/plat-imx/conf.mk
+index b4fbfed5..2b6dbb77 100644
+--- a/core/arch/arm/plat-imx/conf.mk
++++ b/core/arch/arm/plat-imx/conf.mk
+@@ -567,5 +567,11 @@ ifeq ($(CFG_BUSFREQ),y)
+ $(call force,CFG_SM_PLATFORM_HANDLER,y)
+ endif
+ 
++CFG_DRAM_SIZE_4GB ?= n
++ifeq ($(CFG_DRAM_SIZE_4GB),y)
++$(call force,CFG_CORE_LARGE_PHYS_ADDR,y)
++$(call force,CFG_CORE_ARM64_PA_BITS,36)
++endif
++
+ # Cryptographic configuration
+ include core/arch/arm/plat-imx/crypto_conf.mk
+diff --git a/core/arch/arm/plat-imx/main.c b/core/arch/arm/plat-imx/main.c
+index d3b53d91..8a5ac50e 100644
+--- a/core/arch/arm/plat-imx/main.c
++++ b/core/arch/arm/plat-imx/main.c
+@@ -99,12 +99,14 @@ register_phys_mem_pgdir(MEM_AREA_IO_SEC,
+ #endif
+ 
+ #ifdef DRAM0_NSEC_SIZE
+-register_dynamic_shm(DRAM0_NSEC_BASE, DRAM0_NSEC_SIZE);
++register_ddr(DRAM0_NSEC_BASE, DRAM0_NSEC_SIZE);
+ #endif
+ #if defined DRAM1_NSEC_SIZE && ( DRAM1_NSEC_SIZE > 0 )
+-register_dynamic_shm(DRAM1_NSEC_BASE, DRAM1_NSEC_SIZE);
++register_ddr(DRAM1_NSEC_BASE, DRAM1_NSEC_SIZE);
++#endif
++#if defined CFG_DRAM_SIZE_4GB
++register_ddr(DRAM2_NSEC_BASE, DRAM2_NSEC_SIZE);
+ #endif
+-
+ void itr_core_handler(void)
+ {
+ 	gic_it_handle(&gic_data);
+diff --git a/core/arch/arm/plat-imx/platform_config.h b/core/arch/arm/plat-imx/platform_config.h
+index 1b529da4..c51ca379 100644
+--- a/core/arch/arm/plat-imx/platform_config.h
++++ b/core/arch/arm/plat-imx/platform_config.h
+@@ -80,6 +80,10 @@
+ #define DRAM0_NSEC_SIZE (CFG_TZDRAM_START - CFG_DRAM_BASE)
+ #define DRAM1_NSEC_BASE (CFG_TZDRAM_START + 0x2000000)
+ #define DRAM1_NSEC_SIZE (CFG_DDR_SIZE - DRAM1_NSEC_BASE + CFG_DRAM_BASE)
++#if defined CFG_DRAM_SIZE_4GB
++#define DRAM2_NSEC_BASE 0x100000000
++#define DRAM2_NSEC_SIZE 0x40000000
++#endif
+ #endif
+ 
+ #if defined(CFG_IMX_DEK_HAB) && !defined(DRAM0_NSEC_SIZE)

@@ -1,0 +1,13 @@
+u-boot=> fatload mmc ${fdt_device_id}:${fdt_partition} ${fdt_loadaddr} ${fdt_file}
+64103 bytes read in 16 ms (3.8 MiB/s)
+u-boot=> fatload mmc 0:2 ${kernel_loadaddr} EFI/BOOT/bootaa64.efi  
+497152 bytes read in 24 ms (19.8 MiB/s)
+u-boot=> bootefi ${kernel_loadaddr} ${fdt_loadaddr}
+
+
+efidebug boot add 0000 "BOOT TEST" mmc 0:2 "\EFI\BOOT\bootaa64.efi" "root=/dev/mmcblk0p3 rootwait" 
+efidebug boot order 0000
+
+
+efidebug boot add 0000 "BOOT TEST" mmc 0:2 "\EFI\BOOT\bootaa64.efi"
+efidebug boot order 0000

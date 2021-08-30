@@ -1,0 +1,2 @@
+search.fs_label efi root
+set prefix=($root)/EFI/BOOT

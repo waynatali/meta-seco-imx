@@ -1,2 +1,2 @@
-search.fs_label efi root
+search.fs_label ESP root
 set prefix=($root)/EFI/BOOT

@@ -1,0 +1,18 @@
+diff --git a/core/arch/arm/plat-imx/drivers/tzc380.c b/core/arch/arm/plat-imx/drivers/tzc380.c
+index a178eb58..c1571ece 100644
+--- a/core/arch/arm/plat-imx/drivers/tzc380.c
++++ b/core/arch/arm/plat-imx/drivers/tzc380.c
+@@ -54,7 +54,12 @@ static void imx_configure_tzasc(void)
+		 * outside of the DDR ranged and bypass TZASC protection.
+		 */
+		tzc_configure_region(0, 0x00000000, TZC_ATTR_SP_S_RW);
+-
++		if (IS_ENABLED(CFG_DRAM_SIZE_4GB)) {
++		/*** Note: for the imx8 family the region's start address is address -= DRAM_BASE ***/
++			region =
++				tzc_auto_configure(0xC0000000, 0x40000000,
++						   TZC_ATTR_SP_NS_RW, region);
++		}
+		region =
+			tzc_auto_configure(CFG_IMX_TZC_NSEC_START, CFG_DDR_SIZE,
+					   TZC_ATTR_SP_NS_RW, region);

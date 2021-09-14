@@ -275,6 +275,9 @@ class BootimgEFIPlugin(SourcePlugin):
             (key_dir, key_dir, hdddir, kernel, hdddir, kernel)
         exec_cmd(sign_cmd)
         
+        install_cmd = "install -d %s/EFI/UpdateCapsule" % hdddir
+        exec_cmd(install_cmd)
+
         startup = os.path.join(kernel_dir, "startup.nsh")
         if os.path.exists(startup):
             cp_cmd = "cp %s %s/" % (startup, hdddir)

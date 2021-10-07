@@ -1,0 +1,20 @@
+/dts-v1/;
+
+/ {
+	description = "Automatic U-Boot environment update";
+	#address-cells = <2>;
+
+	images {
+		flash-bin {
+			description = "U-Boot binary";
+			data = /incbin/("flash.bin");
+			compression = "none";
+			type = "firmware";
+			arch = "arm64";
+			load = <0>;
+			hash-1 {
+				algo = "sha1";
+			};
+		};
+	};
+};

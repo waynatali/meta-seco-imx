@@ -1,29 +1,20 @@
-# Copyright (C) 2013-2016 Freescale Semiconductor
-# Copyright 2018 (C) O.S. Systems Software LTDA.
-# Copyright (C) 2017-2021 NXP
+DESCRIPTION = "i.MX U-Boot suppporting i.MX SECO boards."
 
-PROVIDES += "u-boot"
+LICENSE = "GPLv2+"
+LIC_FILES_CHKSUM = "file://Licenses/gpl-2.0.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-do_deploy_append_mx8m() {
-    # Deploy the mkimage, u-boot-nodtb.bin and fsl-imx8m*-XX.dtb for mkimage to generate boot binary
-    if [ -n "${UBOOT_CONFIG}" ]
-    then
-        for config in ${UBOOT_MACHINE}; do
-            i=$(expr $i + 1);
-            for type in ${UBOOT_CONFIG}; do
-                j=$(expr $j + 1);
-                if [ $j -eq $i ]
-                then
-                    install -d ${DEPLOYDIR}/${BOOT_TOOLS}
-                    install -m 0777 ${B}/${config}/arch/arm/dts/${UBOOT_DTB_NAME}  ${DEPLOYDIR}/${BOOT_TOOLS}
-                    install -m 0777 ${B}/${config}/u-boot-nodtb.bin  ${DEPLOYDIR}/${BOOT_TOOLS}/u-boot-nodtb.bin-${MACHINE}-${UBOOT_CONFIG}
-                fi
-            done
-            unset  j
-        done
-        unset  i
-    fi
-}
+SRC_URI = "git://git.seco.com/pub/i.mx/yocto/5.x/uboot-seco-imx.git;protocol=https;branch=${SRCBRANCH}"
+SRCBRANCH = "ohos/develop/imx_5.10.35_2.0.0"
+SRCREV = "c2648e967038c861c13fa5fecd3f532470306683"
 
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-COMPATIBLE_MACHINE = "(mx6|mx7|mx8)"
+DEPENDS += "flex-native bison-native bc-native dtc-native"
+
+S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
+
+inherit fsl-u-boot-localversion
+
+LOCALVERSION ?= "-${SRCBRANCH}"
+
+BOOT_TOOLS = "imx-boot-tools"
+

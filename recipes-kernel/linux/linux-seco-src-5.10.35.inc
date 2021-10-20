@@ -7,8 +7,8 @@ KERNEL_SRC ?= "git://git.seco.com/pub/i.mx/yocto/5.x/linux-seco-imx.git"
 
 PROTOCOL ?= "protocol=ssh;"
 REPO_USER ?= ""
-SRCBRANCH = "ohos/develop/imx_5.10.35_2.0.0"
+SRCBRANCH = "ohos/develop/imx_5.10.35_2.0.0_c61_hw_en"
 SRC_URI = "${KERNEL_SRC};branch=${SRCBRANCH};${PROTOCOL}${REPO_USER}"
-SRCREV = "5c9049b0d846cadb95cd9c5ee473d1efcc425bf0"
+SRCREV = "4b3fa48a581e035372b2fd144a6765aee8ab0255"
 
 LINUX_VERSION ?= "5.10.35"

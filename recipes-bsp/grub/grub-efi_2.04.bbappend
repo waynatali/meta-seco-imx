@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI += "file://cfg \
             file://key_gen.sh"
 
-DEPENDS += " openssl "
+DEPENDS += " openssl efitools-native sbsigntool-native "
 
 do_sign() {
 	cd ${B}

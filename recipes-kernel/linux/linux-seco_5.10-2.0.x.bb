@@ -2,7 +2,6 @@ SUMMARY = "Linux Kernel provided and supported by SECO"
 DESCRIPTION = "Linux Kernel provided and supported by SECO with focus on \
 SECO Boards. It includes support for many IPs such as GPU, VPU and IPU."
 
-
 require recipes-kernel/linux/linux-imx.inc
 
 include linux-seco-src-5.10.35.inc
@@ -20,6 +19,6 @@ do_preconfigure[depends] = "linux-firmware:do_populate_sysroot"
 do_preconfigure_prepend() {
 	install -d ${B}
 	cp ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+	cp -arv ${WORKDIR}/recipe-sysroot/lib/firmware ${S}
 	echo 'CONFIG_EXTRA_FIRMWARE_DIR="firmware"' >> ${WORKDIR}/defconfig
-	cp -arv ${WORKDIR}/recipe-sysroot/lib/firmware ${S}/firmware/
 }

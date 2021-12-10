@@ -1,8 +1,10 @@
-From ae36390629bd9c92cb732800a341f04ca11cd9c7 Mon Sep 17 00:00:00 2001
-From: Lans Zhang <jia.zhang@windriver.com>
-Date: Wed, 16 Aug 2017 22:59:12 +0800
-Subject: [PATCH] Dynamically load openssl.cnf for openssl-1.0.x and 1.1.x
+From ad9e729231211c2ba437294a354966b86441988d Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei.gherzan@huawei.com>
+Date: Fri, 10 Dec 2021 11:06:05 +0100
+Subject: [PATCH] Dynamically load openssl.cnf for openssl-3.0
 
+Upstream-status: Pending
+Signed-off-by: Andrei Gherzan <andrei.gherzan@huawei.com>
 Signed-off-by: Lans Zhang <jia.zhang@windriver.com>
 ---
  Make.rules | 14 ++++++++++++--
@@ -20,7 +22,7 @@ index 38c7a22..69c57cb 100644
 +	@if [ -s "$(OPENSSL_LIB)/ssl/openssl.cnf" ]; then \
 +	    cfg="$(OPENSSL_LIB)/ssl/openssl.cnf"; \
 +	else \
-+	    cfg="$(OPENSSL_LIB)/ssl-1.1/openssl.cnf"; \
++	    cfg="$(OPENSSL_LIB)/ssl-3/openssl.cnf"; \
 +	fi; \
 +	$(OPENSSL) req -config $$cfg -new -x509 -newkey rsa:2048 -subj "/CN=$*/" -keyout $*.key -out $@ -days 3650 -nodes -sha256
  
@@ -32,12 +34,12 @@ index 38c7a22..69c57cb 100644
 +	@if [ -s "$(OPENSSL_LIB)/ssl/openssl.cnf" ]; then \
 +	    cfg="$(OPENSSL_LIB)/ssl/openssl.cnf"; \
 +	else \
-+	    cfg="$(OPENSSL_LIB)/ssl-1.1/openssl.cnf"; \
++	    cfg="$(OPENSSL_LIB)/ssl-3/openssl.cnf"; \
 +	fi; \
 +	$(OPENSSL) req -config $$cfg -new -newkey rsa:2048 -keyout $*-subkey.key -subj "/CN=Subkey $* of KEK/" -out $@ -nodes
  
  %-subkey.crt: %-subkey.csr KEK.crt
  	$(OPENSSL) x509 -req -in $< -CA DB.crt -CAkey DB.key -set_serial 1 -out $@ -days 365
 -- 
-2.7.5
+2.25.1
 

@@ -39,6 +39,9 @@ This layer depends on:
   layers: meta
   branch: dunfell
 
+  URI: https://git.yoctoproject.org/meta-intel
+  branch: master
+
 
 Configuration
 =============

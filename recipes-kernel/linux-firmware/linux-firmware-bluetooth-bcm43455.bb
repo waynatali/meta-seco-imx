@@ -25,16 +25,16 @@ do_install() {
 	install -m 644 ${S}/LICENCE.cypress ${D}${base_prefix}/etc/firmware/LICENCE.cypress_bcm43455
 }
 
-LICENSE_${PN} = "Firmware-cypress-bcm43455"
-LICENSE_${PN}-cypress-license = "Firmware-cypress-bcm43455"
+LICENSE:${PN} = "Firmware-cypress-bcm43455"
+LICENSE:${PN}-cypress-license = "Firmware-cypress-bcm43455"
 
-FILES_${PN}-cypress-license = "${nonarch_base_libdir}/firmware/LICENCE.cypress_bcm43455"
-FILES_${PN} = " \
+FILES:${PN}-cypress-license = "${nonarch_base_libdir}/firmware/LICENCE.cypress_bcm43455"
+FILES:${PN} = " \
 	${nonarch_base_libdir}/firmware/ \
 	${base_prefix}/etc/firmware/ \
 "
 
-RDEPENDS_${PN} += "${PN}-cypress-license"
+RDEPENDS:${PN} += "${PN}-cypress-license"
 
 # Firmware files are generally not ran on the CPU, so they can be
 # allarch despite being architecture specific

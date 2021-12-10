@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://cfg \
             file://key_gen.sh"
 
@@ -13,11 +13,11 @@ do_sign() {
 
 addtask sign after do_mkimage before do_install
 
-do_sign_class-native() {
+do_sign:class-native() {
 	:
 }
 
-do_deploy_append_class-target() {
+do_deploy:append:class-target() {
 	install -m 644 ${B}/PK.auth ${DEPLOYDIR}
 	install -m 644 ${B}/KEK.auth ${DEPLOYDIR}
 	install -m 644 ${B}/db.auth ${DEPLOYDIR}

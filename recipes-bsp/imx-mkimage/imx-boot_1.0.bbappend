@@ -1,9 +1,9 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/imx-boot:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/imx-boot:"
 SRC_URI += " \
             file://0001-imx-boot-RAM-4G.patch \
             file://capsule1.its"
 
-do_deploy_append() {
+do_deploy:append() {
 	cp ${STAGING_DIR_NATIVE}/${bindir}/mkeficapsule ${BOOT_STAGING}
 	cp ../capsule1.its ${BOOT_STAGING}
 	cd ${BOOT_STAGING}

@@ -17,7 +17,7 @@ EXTRA_OEMAKE:append:mx8 = " ARCH=arm64"
 KBUILD_DEFCONFIG:seco-imx8mm-c61 = "seco_imx8_linux_defconfig"
 
 
-do_preconfigure:prepend() {
+do_kernel_localversion:prepend() {
     install -d ${B}
     cp ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
 }

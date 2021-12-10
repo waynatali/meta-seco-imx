@@ -1,7 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/imx-boot:"
 SRC_URI += " \
             file://0001-imx-boot-RAM-4G.patch \
-            file://0002-imx-boot-fit-fix-node-name.patch \
             file://capsule1.its"
 
 do_deploy_append() {

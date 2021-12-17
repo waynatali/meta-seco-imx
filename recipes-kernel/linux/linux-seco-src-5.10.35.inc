@@ -7,11 +7,11 @@ KERNEL_SRC ?= "git://git.seco.com/pub/i.mx/yocto/5.x/linux-seco-imx.git"
 
 PROTOCOL ?= "protocol=ssh;"
 REPO_USER ?= ""
-SRCBRANCH = "ohos/develop/imx_5.10.35_2.0.0"
+SRCBRANCH = "ohos/filter/imx_5.10.35_2.0.0"
 SRC_URI = " \
 	${KERNEL_SRC};branch=${SRCBRANCH};${PROTOCOL}${REPO_USER} \
 	file://firmware.cfg \
 "
-SRCREV = "ead23a59d81ac1b4c98659c0453f15ea3db6e5dd"
+SRCREV = "bceaacbd93facb35f8728d7c857f4e9394a466de"
 
 LINUX_VERSION ?= "5.10.35"

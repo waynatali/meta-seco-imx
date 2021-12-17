@@ -8,7 +8,7 @@ NO_GENERIC_LICENSE[Firmware-cypress-bcm43455] = "LICENCE.cypress"
 inherit allarch
 
 SRC_URI = "git://github.com/murata-wireless/cyw-bt-patch;protocol=https"
-SRCREV = "580abcb5b5f06c9ccfb1438b1f52d8bccdff57e6"
+SRCREV = "9d040c25688071d3b53ee918e5af55a79e00c3c0"
 
 S = "${WORKDIR}/git"
 
@@ -16,12 +16,12 @@ PACKAGES =+ "${PN}-cypress-license"
 
 do_install() {
 	install -d ${D}${nonarch_base_libdir}/firmware/brcm/
-	install -m 644 ${S}/BCM4345C0_003.001.025.0144.0266.1MW.hcd ${D}${nonarch_base_libdir}/firmware/brcm/BCM4345C0.hcd
+	install -m 644 ${S}/BCM4345C0_003.001.025.0172.0344.1MW.hcd ${D}${nonarch_base_libdir}/firmware/brcm/BCM4345C0.hcd
 	install -m 644 ${S}/LICENCE.cypress ${D}${nonarch_base_libdir}/firmware/LICENCE.cypress_bcm43455
 
 	# another expected firmware location is etc/firmware
 	install -d ${D}${base_prefix}/etc/firmware/brcm
-	install -m 644 ${S}/BCM4345C0_003.001.025.0144.0266.1MW.hcd ${D}${base_prefix}/etc/firmware/brcm/BCM4345C0.hcd
+	install -m 644 ${S}/BCM4345C0_003.001.025.0172.0344.1MW.hcd ${D}${base_prefix}/etc/firmware/brcm/BCM4345C0.hcd
 	install -m 644 ${S}/LICENCE.cypress ${D}${base_prefix}/etc/firmware/LICENCE.cypress_bcm43455
 }
 

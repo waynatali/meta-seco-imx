@@ -10,7 +10,7 @@ in the Linux 3.8 kernel. \
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e28f66b16cb46be47b20a4cdfe6e99a1"
 
-DEPENDS_append = " \
+DEPENDS:append = " \
     help2man-native openssl-native sbsigntool-native \
     libfile-slurp-perl-native \
 "
@@ -18,7 +18,7 @@ DEPENDS_append = " \
 PV = "1.9.2+git${SRCPV}"
 
 SRC_URI = "\
-    git://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git \
+    git://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git;branch=master \
     file://Fix-for-the-cross-compilation.patch \
     file://Kill-all-the-build-warning-caused-by-implicit-declar.patch \
     file://Fix-the-wrong-dependency-for-blacklist.esl.patch \
@@ -28,7 +28,7 @@ SRC_URI = "\
     file://Don-t-build-PreLoader.efi.patch \
     file://Reuse-xxdi.pl.patch \
     file://Add-static-keyword-for-IsValidVariableHeader.patch \
-    file://Dynamically-load-openssl.cnf-for-openssl-1.0.x-and-1.patch \
+    file://Dynamically-load-openssl.cnf-for-openssl-3.0.patch \
     file://0001-console.c-Fix-compilation-against-latest-usr-include.patch \
 "
 SRCREV = "392836a46ce3c92b55dc88a1aebbcfdfc5dcddce"
@@ -47,12 +47,12 @@ EXTRA_OEMAKE = "\
     OPENSSL_LIB='${STAGING_LIBDIR_NATIVE}' \
     EXTRA_LDFLAGS='${LDFLAGS}' \
 "
-EXTRA_OEMAKE_append:x86 = " ARCH=ia32"
-EXTRA_OEMAKE_append:x86-64 = " ARCH=x86_64"
+EXTRA_OEMAKE:append:x86 = " ARCH=ia32"
+EXTRA_OEMAKE:append:x86-64 = " ARCH=x86_64"
 
 EFI_BOOT_PATH = "/boot/efi/EFI/BOOT"
 
-do_compile_prepend() {
+do_compile:prepend() {
     sed -i -e "1s:#!.*:#!/usr/bin/env nativeperl:" xxdi.pl 
 }
 
@@ -74,6 +74,6 @@ do_sign[prefuncs] += "${@'check_boot_public_key' if d.getVar('GRUB_SIGN_VERIFY',
 fakeroot python do_sign() {
 }
 
-FILES_${PN} += "${EFI_BOOT_PATH}"
+FILES:${PN} += "${EFI_BOOT_PATH}"
 
 SSTATE_DUPWHITELIST += "${DEPLOY_DIR_IMAGE}/LockDown.efi"

@@ -1,4 +1,4 @@
-do_install_append() {
+do_install:append() {
 
 	# Fix this warning: [pulseaudio] protocol-native.c: Denied access to client with invalid authentication data. 
 	if [ -f ${D}${sysconfdir}/pulse/system.pa ]; then

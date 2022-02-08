@@ -23,11 +23,11 @@ B = "${WORKDIR}/build.${PLATFORM_FLAVOR}"
 inherit deploy python3native autotools
 
 PLATFORM_FLAVOR             = "mx8mmevk"
-PLATFORM_FLAVOR_mx8mm             = "mx8mmevk"
+PLATFORM_FLAVOR:mx8mm       = "mx8mmevk"
 
 OPTEE_ARCH ?= "arm32"
-OPTEE_ARCH_armv7a = "arm32"
-OPTEE_ARCH_aarch64 = "arm64"
+OPTEE_ARCH:armv7a = "arm32"
+OPTEE_ARCH:aarch64 = "arm64"
 
 # Optee-os can be built for 32 bits and 64 bits at the same time
 # as long as the compilers are correctly defined.
@@ -39,11 +39,9 @@ EXTRA_OEMAKE = " \
     PLATFORM_FLAVOR=${PLATFORM_FLAVOR} \
     CROSS_COMPILE=${HOST_PREFIX} \
     CROSS_COMPILE64=${HOST_PREFIX} \
-    CFG_DDR_SIZE=0xC0000000 \
-    CFG_DRAM_SIZE_4GB=y \
     -C ${S} O=${B} \
 "
-
+EXTRA_OEMAKE:append:seco-imx8mm-c61-4gb = " CFG_DDR_SIZE=0xC0000000 CFG_DRAM_SIZE_4GB=y "
 LDFLAGS = ""
 CFLAGS += "--sysroot=${STAGING_DIR_HOST}"
 CXXFLAGS += "--sysroot=${STAGING_DIR_HOST}"
@@ -87,9 +85,9 @@ do_install () {
 addtask deploy after do_compile before do_install
 
 
-FILES_${PN} = "${nonarch_base_libdir}/firmware/ /lib*/optee_armtz/"
-FILES_${PN}-staticdev = "/usr/include/optee/"
-RDEPENDS_${PN}-dev += "${PN}-staticdev"
+FILES:${PN} = "${nonarch_base_libdir}/firmware/ /lib*/optee_armtz/"
+FILES:${PN}-staticdev = "/usr/include/optee/"
+RDEPENDS:${PN}-dev += "${PN}-staticdev"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 COMPATIBLE_MACHINE = "(imx|imx-boot-container|mx8)"

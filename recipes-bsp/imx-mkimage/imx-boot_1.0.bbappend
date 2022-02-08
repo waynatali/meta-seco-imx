@@ -1,7 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/imx-boot:"
-SRC_URI += " \
-            file://0001-imx-boot-RAM-4G.patch \
-            file://capsule1.its"
+SRC_URI:append = " file://capsule1.its "
+SRC_URI:append:seco-imx8mm-c61-4gb = " file://0001-imx-boot-RAM-4G.patch "
 
 do_deploy:append() {
 	cp ${STAGING_DIR_NATIVE}/${bindir}/mkeficapsule ${BOOT_STAGING}

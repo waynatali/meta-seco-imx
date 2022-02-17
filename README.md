@@ -20,8 +20,11 @@ Tested Hardware
 
 This layer has been tested with the following MACHINE variables:
 
-  - `seco-imx8mm-c61` (SBC-SECO-C61)
+  - `seco-imx8mm-c61-2gb` (SBC-SECO-C61 2GB RAM)
+  - `seco-imx8mm-c61-4gb` (SBC-SECO-C61 4GB RAM)
 
+The differentiation is due to OP-TEE configuration that needs a 
+fixed memory mapping prior to boot.
 
 Dependencies
 ============
@@ -29,15 +32,15 @@ Dependencies
 This layer depends on:
 
   URI: git://git.openembedded.org/bitbake
-  branch: dunfell
+  branch: master
 
   URI: git://git.openembedded.org/openembedded-core
   layers: meta
-  branch: dunfell
+  branch: honister
 
   URI: git://github.com/freescale/meta-freescale
   layers: meta
-  branch: dunfell
+  branch: master (honister)
 
   URI: https://git.yoctoproject.org/meta-intel
   branch: master
@@ -58,17 +61,17 @@ Configuration
 
 4. Configure the variable MACHINE in your local.conf.
 ```bitbake
-	MACHINE ?= "seco-imx8mm-c61"
+	MACHINE ?= "seco-imx8mm-c61-2gb"
 ```
  or while using bitbake:
-```
-	MACHINE="seco-imx8mm-c61" bitbake core-image-minimal
+```bash
+	MACHINE="seco-imx8mm-c61-2gb" bitbake core-image-minimal
 ```
 
-
+ 
 Credits
 =======
 
 Based on the `meta-freescale` layer from [freescale][freescale].
 
-[freescale]: https://git.yoctoproject.org/cgit/cgit.cgi/meta-intel/
+[freescale]: https://git.yoctoproject.org/cgit/cgit.cgi/meta-freescale/

@@ -12,6 +12,6 @@ SRC_URI = " \
 	${KERNEL_SRC};branch=${SRCBRANCH};${PROTOCOL}${REPO_USER} \
 	file://firmware.cfg \
 "
-SRCREV = "bceaacbd93facb35f8728d7c857f4e9394a466de"
+SRCREV = "761d40791786d62d656842e9e509806e209ab542"
 
 LINUX_VERSION ?= "5.10.35"

@@ -23,7 +23,7 @@ B = "${WORKDIR}/build.${PLATFORM_FLAVOR}"
 inherit deploy python3native autotools
 
 PLATFORM_FLAVOR             = "mx8mmevk"
-PLATFORM_FLAVOR:mx8mm       = "mx8mmevk"
+PLATFORM_FLAVOR:mx8mm-nxp-bsp       = "mx8mmevk"
 
 OPTEE_ARCH ?= "arm32"
 OPTEE_ARCH:armv7a = "arm32"
@@ -90,4 +90,4 @@ FILES:${PN}-staticdev = "/usr/include/optee/"
 RDEPENDS:${PN}-dev += "${PN}-staticdev"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-COMPATIBLE_MACHINE = "(imx|imx-boot-container|mx8)"
+COMPATIBLE_MACHINE = "(imx-nxp-bsp|imx-boot-container|mx8-nxp-bsp)"

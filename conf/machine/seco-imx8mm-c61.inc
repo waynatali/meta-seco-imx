@@ -1,6 +1,6 @@
 
 MACHINEOVERRIDES =. "mx8:mx8m:mx8mm:seco-imx8mm-c61:"
-IMX_DEFAULT_BSP = "seco"
+IMX_DEFAULT_BSP = "nxp"
 
 require conf/machine/include/imx-base.inc
 require conf/machine/include/arm/armv8a/tune-cortexa53.inc

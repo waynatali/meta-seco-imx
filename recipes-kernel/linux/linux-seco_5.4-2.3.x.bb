@@ -10,9 +10,9 @@ include linux-seco-src-5.4.70.inc
 
 DEPENDS += "lzop-native bc-native"
 
-COMPATIBLE_MACHINE = "(mx6|mx7|mx8)"
-EXTRA_OEMAKE:append:mx6 = " ARCH=arm"
-EXTRA_OEMAKE:append:mx8 = " ARCH=arm64"
+COMPATIBLE_MACHINE = "(mx6-nxp-bsp|mx7-nxp-bsp|mx8-nxp-bsp)"
+EXTRA_OEMAKE:append:mx6-nxp-bsp = " ARCH=arm"
+EXTRA_OEMAKE:append:mx8-nxp-bsp = " ARCH=arm64"
 
 KBUILD_DEFCONFIG:seco-imx8mm-c61 = "seco_imx8_linux_defconfig"
 

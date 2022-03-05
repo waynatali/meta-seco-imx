@@ -24,4 +24,4 @@ LINUX_VERSION = "5.10.10"
 SRCBRANCH = "seco/develop/v5.10.10"
 SRCREV = "7513d95643a0d547199897f122a512928873445a"
 
-COMPATIBLE_MACHINE = "(mxs|mx5|mx6|mx8|vf|use-mainline-bsp)"
+COMPATIBLE_MACHINE = "(mxs-generic-bsp|mx5-generic-bsp|mx6-nxp-bsp|mx8-nxp-bsp|vf-generic-bsp|use-mainline-bsp)"

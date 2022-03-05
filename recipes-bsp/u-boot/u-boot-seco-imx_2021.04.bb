@@ -7,7 +7,7 @@ require u-boot-seco-imx-common.inc
 
 PROVIDES += "u-boot"
 
-do_deploy:append:mx8m() {
+do_deploy:append:mx8m-nxp-bsp() {
     # Deploy the mkimage, u-boot-nodtb.bin and fsl-imx8m*-XX.dtb for mkimage to generate boot binary
     if [ -n "${UBOOT_CONFIG}" ]
     then
@@ -29,4 +29,4 @@ do_deploy:append:mx8m() {
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-COMPATIBLE_MACHINE = "(mx6|mx7|mx8)"
+COMPATIBLE_MACHINE = "(mx6-nxp-bsp|mx7-nxp-bsp|mx8-nxp-bsp)"

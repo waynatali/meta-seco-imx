@@ -82,9 +82,9 @@ UBOOT_SUFFIX = "bin"
 UBOOT_MAKE_TARGET = ""
 IMX_BOOT_SEEK = "33"
 
-PREFERRED_VERSION_optee-os:mx8     = "3.13.0.imx"
-PREFERRED_VERSION_optee-client:mx8 = "3.13.0.imx"
-PREFERRED_VERSION_optee-test:mx8   = "3.13.0.imx"
+PREFERRED_VERSION_optee-os:mx8-nxp-bsp     = "3.13.0.imx"
+PREFERRED_VERSION_optee-client:mx8-nxp-bsp = "3.13.0.imx"
+PREFERRED_VERSION_optee-test:mx8-nxp-bsp   = "3.13.0.imx"
 OPTEE_BIN_EXT = "8mm"
 
 IMAGE_INSTALL:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'optee', ' optee-os optee-client ', '', d)} "

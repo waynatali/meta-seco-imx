@@ -1,6 +1,6 @@
 
 MACHINEOVERRIDES =. "mx8:mx8m:mx8mm:seco-imx8mm-c61:"
-IMX_DEFAULT_BSP = "nxp"
+IMX_DEFAULT_BSP ?= "nxp"
 
 require conf/machine/include/imx-base.inc
 require conf/machine/include/arm/armv8a/tune-cortexa53.inc
@@ -15,7 +15,7 @@ MACHINE_FEATURES += " pci optee pulseaudio "
 
 KERNEL_DEVICETREE_BASENAME = "seco-imx8mm-c61"
 
-KERNEL_DEVICETREE:use-seco-bsp = " \
+KERNEL_DEVICETREE = " \
     seco/${KERNEL_DEVICETREE_BASENAME}.dtb \
     seco/overlays/seco-imx8mm-c61-video-sn65dsi86.dtbo\
     seco/overlays/seco-imx8mm-c61-video-sn65dsi84.dtbo\
@@ -48,8 +48,8 @@ IMG_KERNEL_DEVICETREE = "\
 "
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-seco"
-PREFERRED_PROVIDER_virtual/bootloader = "u-boot-seco-imx"
-PREFERRED_PROVIDER_u-boot = "u-boot-seco-imx"
+PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-seco-imx"
+PREFERRED_PROVIDER_u-boot ?= "u-boot-seco-imx"
 
 UBOOT_CONFIG ??= "emmc"
 UBOOT_CONFIG_BASENAME = "seco_imx8mm_c61"
@@ -61,6 +61,8 @@ ATF_MACHINE_NAME = "bl31-imx8mm.bin"
 IMX_BOOT_SOC_TARGET = "iMX8MM"
 ATF_PLATFORM = "imx8mm"
 ATF_LOAD_ADDR = "0x920000"
+
+OPTEE_PLATFORM_FLAVOR = "mx8mmevk"
 
 # Set u-boot DTB
 UBOOT_DTB_NAME = "seco-imx8mm-c61.dtb"

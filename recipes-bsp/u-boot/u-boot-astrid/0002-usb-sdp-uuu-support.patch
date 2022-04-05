@@ -2353,7 +2353,7 @@ index 018989dd16..fca76ec343 100644
  
  #if CONFIG_IS_ENABLED(FASTBOOT_FLASH)
 diff --git a/drivers/usb/gadget/ci_udc.c b/drivers/usb/gadget/ci_udc.c
-index 542684c1c3..1869965057 100644
+index 542684c1c3..19f346b3cd 100644
 --- a/drivers/usb/gadget/ci_udc.c
 +++ b/drivers/usb/gadget/ci_udc.c
 @@ -13,16 +13,27 @@
@@ -2525,7 +2525,7 @@ index 542684c1c3..1869965057 100644
  int usb_gadget_register_driver(struct usb_gadget_driver *driver)
  {
  	int ret;
-@@ -1066,10 +1192,280 @@ int usb_gadget_unregister_driver(struct usb_gadget_driver *driver)
+@@ -1066,10 +1192,278 @@ int usb_gadget_unregister_driver(struct usb_gadget_driver *driver)
  
  	return 0;
  }
@@ -2619,9 +2619,7 @@ index 542684c1c3..1869965057 100644
 +		if (ret)
 +			return ret;
 +
-+		ret = clk_free(&priv->phy_clk);
-+		if (ret)
-+			return ret;
++		clk_free(&priv->phy_clk);
 +	}
 +#endif
 +

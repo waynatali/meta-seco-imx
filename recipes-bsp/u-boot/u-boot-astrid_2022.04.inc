@@ -9,7 +9,7 @@ DEPENDS += "flex-native bison-native bc-native dtc-native"
 
 SRC_URI = "git://source.denx.de/u-boot/u-boot.git;protocol=https;branch=${SRCBRANCH}"
 SRCBRANCH = "master"
-SRCREV = "e7fb67df319cec410c20906bbf33936a6f7479b2"
+SRCREV = "01f1ab67f38882dc7665a0a6eca4bbeba6d84f81"
 
 PV = "v2022.04+git${SRCPV}"
 

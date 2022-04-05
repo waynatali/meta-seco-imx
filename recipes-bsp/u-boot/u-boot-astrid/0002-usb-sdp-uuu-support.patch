@@ -1,8 +1,8 @@
 diff --git a/Makefile b/Makefile
-index 697cc51d67..9dec1773ba 100644
+index 81349a7694..7146c4c436 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -836,6 +836,7 @@ libs-y += drivers/usb/musb/
+@@ -843,6 +843,7 @@ libs-y += drivers/usb/musb/
  libs-y += drivers/usb/musb-new/
  libs-y += drivers/usb/phy/
  libs-y += drivers/usb/ulpi/
@@ -111,10 +111,10 @@ index 76132defc2..aa1d6a33e4 100644
  int set_clk_enet(enum enet_freq type)
  {
 diff --git a/arch/arm/mach-imx/imx8m/soc.c b/arch/arm/mach-imx/imx8m/soc.c
-index 1a5a391443..a92c21bcb5 100644
+index 7397b99a1e..fe2207cb37 100644
 --- a/arch/arm/mach-imx/imx8m/soc.c
 +++ b/arch/arm/mach-imx/imx8m/soc.c
-@@ -29,6 +29,7 @@
+@@ -30,6 +30,7 @@
  #include <imx_sip.h>
  #include <linux/arm-smccc.h>
  #include <linux/bitops.h>
@@ -122,7 +122,7 @@ index 1a5a391443..a92c21bcb5 100644
  
  DECLARE_GLOBAL_DATA_PTR;
  
-@@ -673,6 +674,18 @@ bool is_usb_boot(void)
+@@ -675,6 +676,18 @@ bool is_usb_boot(void)
  {
  	return get_boot_device() == USB_BOOT;
  }
@@ -141,7 +141,7 @@ index 1a5a391443..a92c21bcb5 100644
  
  #ifdef CONFIG_OF_SYSTEM_SETUP
  bool check_fdt_new_path(void *blob)
-@@ -1216,6 +1229,62 @@ int arch_misc_init(void)
+@@ -1218,6 +1231,62 @@ int arch_misc_init(void)
  }
  #endif
  
@@ -1480,10 +1480,10 @@ index 0000000000..0ac2de5d72
 +}
 diff --git a/drivers/fastboot/fb_fsl/fb_fsl_partitions.c b/drivers/fastboot/fb_fsl/fb_fsl_partitions.c
 new file mode 100644
-index 0000000000..b4219d0f76
+index 0000000000..83f5003510
 --- /dev/null
 +++ b/drivers/fastboot/fb_fsl/fb_fsl_partitions.c
-@@ -0,0 +1,408 @@
+@@ -0,0 +1,407 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright 2019-2020 NXP
@@ -1891,13 +1891,12 @@ index 0000000000..b4219d0f76
 +	}
 +	return false;
 +}
-+
 diff --git a/drivers/fastboot/fb_fsl_partitions.c b/drivers/fastboot/fb_fsl_partitions.c
 new file mode 100644
-index 0000000000..342b56d735
+index 0000000000..3ac426a1bf
 --- /dev/null
 +++ b/drivers/fastboot/fb_fsl_partitions.c
-@@ -0,0 +1,408 @@
+@@ -0,0 +1,407 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright 2019-2020 NXP
@@ -2305,7 +2304,6 @@ index 0000000000..342b56d735
 +	}
 +	return false;
 +}
-+
 diff --git a/drivers/fastboot/fb_getvar.c b/drivers/fastboot/fb_getvar.c
 index 018989dd16..fca76ec343 100644
 --- a/drivers/fastboot/fb_getvar.c

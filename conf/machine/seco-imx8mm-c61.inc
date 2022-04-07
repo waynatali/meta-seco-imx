@@ -5,12 +5,6 @@ IMX_DEFAULT_BSP = "nxp"
 require conf/machine/include/imx-base.inc
 require conf/machine/include/arm/armv8a/tune-cortexa53.inc
 
-MACHINEOVERRIDES_EXTENDER_FILTER_OUT:seco-imx8mm-c61 = " \
-	imxgpu \
-	imxgpu2d \
-	imxgpu3d \
-"
-
 MACHINE_FEATURES += " pci optee pulseaudio "
 
 KERNEL_DEVICETREE_BASENAME = "seco-imx8mm-c61"
@@ -95,18 +89,6 @@ IMAGE_INSTALL:append = " \
 	alsa-utils \
 	alsa-lib \
 	bluez-alsa \
-"
-MACHINE_SOCARCH_FILTER:append:seco-imx8mm-c61 = " \
-	virtual/egl \
-	virtual/libopenvg \
-	virtual/libg2d \
-	virtual/libgl \
-	virtual/libgles1 \
-	virtual/libgles2 \
-	virtual/mesa \
-	cairo \
-	pango \
-	qtbase \
 "
 MACHINE_EXTRA_RRECOMMENDS:append = " linux-firmware-bcm43455 linux-firmware-bluetooth-bcm43455 "
 

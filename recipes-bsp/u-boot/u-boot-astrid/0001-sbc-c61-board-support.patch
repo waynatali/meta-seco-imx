@@ -3815,7 +3815,7 @@ index 0000000000..c2f0241f72
 +};
 diff --git a/configs/seco_imx8mm_c61_defconfig b/configs/seco_imx8mm_c61_defconfig
 new file mode 100644
-index 0000000000..5de32b74a0
+index 0000000000..b18e8929e7
 --- /dev/null
 +++ b/configs/seco_imx8mm_c61_defconfig
 @@ -0,0 +1,204 @@
@@ -3934,7 +3934,7 @@ index 0000000000..5de32b74a0
 +CONFIG_MMC_IO_VOLTAGE=y
 +CONFIG_MMC_UHS_SUPPORT=y
 +CONFIG_MMC_HS400_SUPPORT=y
-+CONFIG_MMC_HS400_ES_SUPPORT=y
++#CONFIG_MMC_HS400_ES_SUPPORT is not set
 +CONFIG_EFI_PARTITION=y
 +CONFIG_SUPPORT_EMMC_RPMB=y
 +CONFIG_SUPPORT_EMMC_BOOT=y

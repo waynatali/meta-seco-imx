@@ -113,7 +113,7 @@ MACHINE_SOCARCH_FILTER:append:seco-imx8mm-c61 = " \
 MACHINE_EXTRA_RRECOMMENDS:append = " linux-firmware-bcm43455 linux-firmware-bluetooth-bcm43455 "
 
 EFI_PROVIDER = "grub-efi"
-WKS_FILE:seco-imx8mm-c61 = " ${@bb.utils.contains('EFI_PROVIDER', 'grub-efi', 'x-imx-uboot-bootpart-efi.wks.in', '', d)} "
-WKS_FILE_DEPENDS:append = " imx-boot sbsigntool-native"
+
+WKS_FILE_DEPENDS:append = " sbsigntool-native"
 IMAGE_INSTALL:append = " ${@bb.utils.contains('EFI_PROVIDER', 'grub-efi', 'grub-efi grub-bootconf', '', d)} "
 

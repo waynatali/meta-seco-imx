@@ -1,6 +1,6 @@
 
 MACHINEOVERRIDES =. "mx8:mx8m:mx8mm:seco-imx8mm-c61:"
-IMX_DEFAULT_BSP ?= "nxp"
+IMX_DEFAULT_BSP = "mainline"
 
 require conf/machine/include/imx-base.inc
 require conf/machine/include/arm/armv8a/tune-cortexa53.inc
@@ -42,8 +42,8 @@ IMG_KERNEL_DEVICETREE = "\
 "
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-seco"
-PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-seco-imx"
-PREFERRED_PROVIDER_u-boot ?= "u-boot-seco-imx"
+PREFERRED_PROVIDER_virtual/bootloader = "u-boot-astrid"
+PREFERRED_PROVIDER_u-boot = "u-boot-astrid"
 
 UBOOT_CONFIG ??= "emmc"
 UBOOT_CONFIG_BASENAME = "seco_imx8mm_c61"

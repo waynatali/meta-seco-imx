@@ -8,8 +8,6 @@ PATCHPATH = "${CURDIR}/u-boot-astrid"
 
 inherit ${@oe.utils.ifelse(d.getVar('UBOOT_PROVIDES_BOOT_CONTAINER') == '1', 'imx-boot-container-ext', '')}
 
-DEPENDS += " bc-native dtc-native python3-setuptools-native lzop-native "
-
 do_resolve_and_populate_optee_binaries[depends] += " optee-os:do_deploy "
 
 # Location where U-Boot artifacts should be additionally deployed.

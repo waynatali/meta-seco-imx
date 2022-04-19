@@ -18,13 +18,6 @@ PROVIDES += "u-boot"
 
 B = "${WORKDIR}/build"
 
-# FIXME: Allow linking of 'tools' binaries with native libraries
-#        used for generating the boot logo and other tools used
-#        during the build process.
-EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CPPFLAGS}" \
-                 HOSTLDFLAGS="${BUILD_LDFLAGS}" \
-                 HOSTSTRIP=true'
-
 do_configure:prepend:seco-imx8mm-c61-4gb() {
         sed -i -e 's,0xbe000000,0xfe000000,g'  ${S}/board/seco/seco_imx8mm_c61/Kconfig
 

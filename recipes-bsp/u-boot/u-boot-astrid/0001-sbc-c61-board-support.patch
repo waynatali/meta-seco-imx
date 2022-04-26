@@ -4023,727 +4023,21 @@ index 0000000000..b18e8929e7
 +CONFIG_DFU=y
 +CONFIG_EFI_SECURE_BOOT=y
 +#CONFIG_EFI_MM_COMM_TEE is not set
-diff --git a/include/configs/seco_environment.h b/include/configs/seco_environment.h
-new file mode 100644
-index 0000000000..bd91468612
---- /dev/null
-+++ b/include/configs/seco_environment.h
-@@ -0,0 +1,386 @@
-+#ifndef __SECO_ENVIRONMENT_H
-+#define __SECO_ENVIRONMENT_H
-+
-+
-+/*
-+ *
-+ * Variable              Scope                 Description
-+ * --------------------------------------------------------------------------------------------------------
-+ *
-+ * kernel_device_id      eMMC/SD/              numeric id of device
-+ * kernel_partition      eMMC/SD/USB/SATA      numeric id of device's partition
-+ * kernel_file           eMMC/SD/USB/SATA      absolute path (folder+name) of file to load
-+ * kernel_load2ram       all                   u-boot command to exec in order to load file to memory
-+ *
-+ * fdt_autodetect        all                   automatic detect the corret dtb file name (cpu type based)
-+ * fdt_device_id         eMMC/SD/              numeric id of device
-+ * fdt_partition         eMMC/SD/USB/SATA      numeric id of device's partition
-+ * fdt_file              eMMC/SD/USB/SATA      absolute path (folder+name) of file to load
-+ * fdt_load              all                   u-boot command to exec in order to load file to memory
-+ *
-+ * ramfs_use             all                   0 = do not use ramfs ; 1 = use ramfs
-+ * ramfs_device_id       eMMC/SD/              numeric id of device
-+ * ramfs_partition       eMMC/SD/USB/SATA      numeric id of device's partition
-+ * ramfs_file            eMMC/SD/USB/SATA      absolute path (folder+name) of file to load
-+ * ramfs_load2ram        all                   u-boot command to exec in order to load file to memory
-+ *
-+ * root_device_id        eMMC/SD/              numeric id of device
-+ * root_partition        eMMC/SD/USB/SATA      numeric id of device's partition
-+ * root_mount            all                   u-boot command to generate bootargs about FS mount point
-+ *
-+ * ipaddr                TFTP                  target ip
-+ * netmask               TFTP                  target netmask
-+ * nfs_ip_client         NFS                   static IP of client
-+ * nfs_netmask           NFS                   netmask for client
-+ * nfs_ip_server         NFS                   static IP of server
-+ * nfs_path              NFS                   remote path of FS folder
-+ * eth_if                NFS                   id of the eth inteface to use for network Filesystem
-+ *
-+ */
-+
-+
-+
-+/* ____________________________________________________________________________
-+  |                                                                            |
-+  |                                 ENV MACROS                                 |
-+  |____________________________________________________________________________|
-+*/
-+
-+/* -------------------- BOOTSCRIPT -------------------- */
-+#define MACRO_ENV_BOOTSCRIPT_SRC_USDHCI  \
-+	load mmc ${bootscript_device_id}:${bootscript_partition} ${bootscript_loadaddr} ${script}
-+
-+#define MACRO_ENV_BOOTENV_SRC_USDHCI \
-+	load mmc ${bootscript_device_id}:${bootenv_partition} ${bootenv_loadaddr} ${envtxt}
-+
-+
-+/* -------------------- KERNEL -------------------- */
-+
-+#define MACRO_ENV_KERNEL_SRC_USDHCI     \
-+	mmc dev ${kernel_device_id}; load mmc ${kernel_device_id}:${kernel_partition}  ${kernel_loadaddr} ${kernel_file}
-+
-+#define MACRO_ENV_KERNEL_SRC_USB     \
-+	usb start; load usb ${kernel_device_id}:${kernel_partition} ${kernel_loadaddr} ${kernel_file}
-+
-+#define MACRO_ENV_KERNEL_SRC_SATA    \
-+	sata init; load sata 0:${kernel_partition} ${kernel_loadaddr} ${kernel_file}
-+
-+#define MACRO_ENV_KERNEL_SRC_SPI     \
-+	sf probe 0; sf ${kernel_loadaddr} ${kernel_spi_addr} ${kernel_spi_len}
-+
-+#define MACRO_ENV_KERNEL_SRC_TFTP   \
-+	if test "${tftp_use_dhcp}" = "0"; then tftpboot ${kernel_loadaddr} ${kernel_file}; else dhcp ${kernel_loadaddr} ${kernel_file}; fi
-+
-+
-+/* -------------------- FDT -------------------- */
-+#define MACRO_ENV_FDT_SRC_USDHCI     \
-+	load mmc ${fdt_device_id}:${fdt_partition}  ${fdt_loadaddr} ${fdt_file}
-+
-+#define MACRO_ENV_FDT_SRC_USB     \
-+	usb start; load usb ${fdt_device_id}:${fdt_partition} ${fdt_loadaddr} ${fdt_file}
-+
-+#define MACRO_ENV_FDT_SRC_SATA    \
-+	sata init; load sata 0:${fdt_partition} ${fdt_loadaddr} ${fdt_file}
-+
-+#define MACRO_ENV_FDT_SRC_SPI     \
-+	sf probe 0; sf ${fdt_loadaddr} ${fdt_spi_addr} ${fdt_spi_len}
-+
-+#define MACRO_ENV_FDT_SRC_TFTP   \
-+	if test "${tftp_use_dhcp}" = "0"; then tftpboot ${fdt_loadaddr} ${fdt_file}; else dhcp ${fdt_loadaddr} ${fdt_file}; fi
-+
-+#ifdef CONFIG_OF_LIBFDT_OVERLAY
-+#define MACRO_ENV_FDT_LOAD_OVERLAY_BASE \
-+	fdt addr ${fdt_loadaddr}; fdt resize ${fdt_resize}; \
-+	seco_config fdtoverlay ; \
-+	if test -n "${fdt_overlay_per_cmd}"; then run fdt_overlay_per_cmd; fi; \
-+	if test -n "${fdt_overlay_video_cmd}"; then run fdt_overlay_video_cmd; fi;
-+
-+
-+#define MACRO_ENV_FDT_OVERLAY_SRC_USDHCI     \
-+	load mmc ${fdt_device_id}:${fdt_partition}
-+
-+#define MACRO_ENV_FDT_OVERLAY_SRC_USB     \
-+	usb start; load usb ${fdt_device_id}:${fdt_partition}
-+
-+#define MACRO_ENV_FDT_OVERLAY_SRC_SATA    \
-+	sata init; load sata 0:${fdt_partition}
-+
-+#define MACRO_ENV_FDT_OVERLAY_SRC_SPI     \
-+	sf probe 0; sf ${fdt_loadaddr} ${fdt_spi_addr} ${fdt_spi_len}
-+
-+#define MACRO_ENV_FDT_OVERLAY_SRC_TFTP   \
-+	tftpboot
-+
-+#define MACRO_ENV_FDT_OVERLAY_APPLY   \
-+	fdt apply
-+#else
-+#define MACRO_ENV_FDT_LOAD_OVERLAY_BASE "\0"
-+#endif    /* CONFIG_OF_LIBFDT_OVERLAY */
-+
-+
-+/* -------------------- RAMFS -------------------- */
-+
-+#define MACRO_ENV_RAMFS_SRC_USDHCI     \
-+	load mmc ${ramfs_device_id}:${ramfs_partition}  ${ramfs_loadaddr} ${ramfs_file}
-+
-+#define MACRO_ENV_RAMFS_SRC_USB     \
-+	usb start; load usb ${ramfs_device_id}:${ramfs_partition} ${ramfs_loadaddr} ${ramfs_file}
-+
-+#define MACRO_ENV_RAMFS_SRC_SATA    \
-+	sata init; load sata 0:${ramfs_partition} ${ramfs_loadaddr} ${ramfs_file}
-+
-+#define MACRO_ENV_RAMFS_SRC_SPI     \
-+	sf probe 0; sf ${ramfs_loadaddr} ${ramfs_spi_addr} ${ramfs_spi_len}
-+
-+#define MACRO_ENV_RAMFS_SRC_TFTP   \
-+	tftpboot ${ramfs_loadaddr} ${ramfs_file}
-+
-+
-+
-+/* -------------------- FILESYSTEM -------------------- */
-+
-+#define MACRO_ENV_FS_COMMON  rootwait rw
-+
-+#define MACRO_ENV_FS_SRC_USDHCI   \
-+	setenv root_dev root=/dev/mmcblk${root_device_id}p${root_partition} rootwait rw
-+
-+#define MACRO_ENV_FS_SRC_USB      \
-+	setenv root_dev setenv root_dev root=/dev/sda${root_partition} rootwait rw
-+
-+#define MACRO_ENV_FS_SRC_SATA     \
-+	setenv root_dev setenv root=/dev/sda${root_partition} rootwait rw
-+
-+#define MACRO_ENV_FS_SRC_NFS      \
-+	run set_ip; run set_remote_rootfs; setenv root_dev ${remote_fs} ip=${ip}
-+
-+#define MACRO_SET_IP \
-+	if test "${nfs_use_dhcp}" = "0"; then \
-+		run ipsetup; \
-+		setenv ip "${nfs_ip_client}:::${nfs_netmask}::eth0:off"; \
-+	else \
-+		setenv ip ":::::eth0:dhcp"; \
-+	fi; \
-+
-+#define MACRO_SET_REMOTE_ROOTFS \
-+	if test "${nfs_use_dhcp}" = "0"; then \
-+		setenv remote_fs "root=/dev/nfs rootfstype=nfs nfsroot=${nfs_ip_server}:/${nfs_path},wsize=1024,rsize=1024,nfsvers=3 rootwait rw"; \
-+	else \
-+		if test "${nfs_use_dhcp_autopath}" = "0"; then \
-+			setenv remote_fs "root=/dev/nfs rootfstype=nfs nfsroot=/${nfs_path},wsize=1024,rsize=1024,nfsvers=3 rootwait rw"; \
-+		else \
-+			setenv remote_fs "root=/dev/nfs rootfstype=nfs rootwait rw"; \
-+		fi; \
-+	fi
-+
-+
-+
-+
-+/* ____________________________________________________________________________
-+  |                                                                            |
-+  |                                 ENVIRONMENT                                |
-+  |____________________________________________________________________________|
-+*/
-+
-+#define CONFIG_SERVERIP                          13.0.0.1
-+#define CONFIG_IPADDR                            13.0.0.10
-+#define CONFIG_NETMASK                           255.255.255.0
-+#define DEF_NFS_PATH                             "targetfs/"
-+
-+
-+#define ENV_BOOTARGS_BASE  setenv bootargs ${console_interface} ${memory} ${cpu_freq} ${videomode} vt.global_cursor_default=0 ${root_dev}
-+
-+
-+
-+#define ENV_COMMON                                                    \
-+	"bootdelay="__stringify(CONFIG_BOOTDELAY)"\0"                     \
-+	"stdin=serial\0"                                                  \
-+	"stdout=serial\0"                                                 \
-+	"stderr=serial\0"                                                 \
-+	"mmcautodetect="ENV_MMCAUTODETECT"\0"                             \
-+	"fdt_autodetect="ENV_FDTAUTODETECT"\0"                            \
-+	"mem_autodetect="ENV_MEMAUTODETECT"\0"                            \
-+	"run_from_tftp=0\0"                                               \
-+	"tftp_use_dhcp=0\0"
-+
-+
-+#define ENV_ARGS_BASE                                                                          \
-+	"console_interface='console=" __stringify(ENV_CONSOLE_DEV) "," __stringify(CONFIG_BAUDRATE)"'\0"    \
-+	"bootargs_base="__stringify(ENV_BOOTARGS_BASE)"\0"
-+
-+
-+#define ENV_BOOTSCRIPT                                                        \
-+	"script=seco_boot.scr\0"                                                  \
-+	"envtxt=/loader/uEnv.txt\0"                                                       \
-+	"bootscript_device_id="__stringify(ENV_SYS_MMC_ENV_DEV)"\0"               \
-+	"bootscript_partition="__stringify(ENV_SYS_MMC_BOOSCRIPT_PART)"\0"         \
-+	"bootenv_partition="__stringify(ENV_SYS_MMC_BOOATENV_PART)"\0"            \
-+	"bootscript_loadaddr="__stringify(ENV_BOOTSCRIPT_LOADADDR)"\0"                       \
-+	"bootenv_loadaddr="__stringify(ENV_RAMFS_LOADADDR)"\0"                    \
-+	"bootscript_load_usdhci2ram="__stringify(MACRO_ENV_BOOTSCRIPT_SRC_USDHCI)"\0"     \
-+	"bootenv_load_usdhci2ram="__stringify(MACRO_ENV_BOOTENV_SRC_USDHCI)"\0"
-+
-+
-+#define ENV_KERNEL                                                    \
-+	"kernel_device_id="__stringify(ENV_SYS_MMC_ENV_DEV)"\0"           \
-+	"kernel_partition="__stringify(ENV_SYS_MMC_KERNEL_PART)"\0"     \
-+	"kernel_loadaddr="__stringify(ENV_KERNEL_LOADADDR)"\0"                   \
-+	"kernel_file="__stringify(ENV_KERNEL_FILENAME)"\0"                  \
-+	"kernel_load_usdhci2ram="__stringify(MACRO_ENV_KERNEL_SRC_USDHCI)"\0"     \
-+	"kernel_load_usb2ram="__stringify(MACRO_ENV_KERNEL_SRC_USB)"\0"           \
-+	"kernel_load_eth2ram="__stringify(MACRO_ENV_KERNEL_SRC_TFTP)"\0"          \
-+	"kernel_load2ram="__stringify(MACRO_ENV_KERNEL_SRC_USDHCI)"\0"
-+
-+
-+#ifndef CONFIG_OF_LIBFDT_OVERLAY
-+
-+#define ENV_FDT                                                       \
-+	"fdt_device_id="__stringify(ENV_SYS_MMC_ENV_DEV)"\0"              \
-+	"fdt_partition="__stringify(ENV_SYS_MMC_FDT_PART)"\0"        \
-+	"fdt_loadaddr="__stringify(ENV_FDT_LOADADDR)"\0"                  \
-+	"fdt_file="__stringify(ENV_DEFAULT_FDT_FILE)"\0"                  \
-+	"fdt_high=0xffffffff\0"	                                          \
-+	"fdt_load_usdhci2ram="__stringify(MACRO_ENV_FDT_SRC_USDHCI)"\0"           \
-+	"fdt_load_usb2ram="__stringify(MACRO_ENV_FDT_SRC_USB)"\0"                 \
-+	"fdt_load_eth2ram="__stringify(MACRO_ENV_FDT_SRC_TFTP)"\0"                \
-+	"fdt_load2ram="__stringify(MACRO_ENV_FDT_SRC_USDHCI)"\0"
-+
-+#else
-+
-+#define ENV_FDT                                                       \
-+	"fdt_device_id="__stringify(ENV_SYS_MMC_ENV_DEV)"\0"              \
-+	"fdt_partition="__stringify(ENV_SYS_MMC_FDT_PART)"\0"        \
-+	"fdt_loadaddr="__stringify(ENV_FDT_LOADADDR)"\0"                  \
-+	"fdt_file="__stringify(ENV_DEFAULT_FDT_FILE)"\0"                  \
-+	"fdt_high=0xffffffff\0"	                                          \
-+	"fdt_resize="__stringify(ENV_FDT_RESIZE)"\0"                      \
-+	"fdt_load_usdhci2ram="__stringify(MACRO_ENV_FDT_SRC_USDHCI)"\0"           \
-+	"fdt_load_usb2ram="__stringify(MACRO_ENV_FDT_SRC_USB)"\0"                 \
-+	"fdt_load_eth2ram="__stringify(MACRO_ENV_FDT_SRC_TFTP)"\0"                \
-+	"fdt_load2ram="__stringify(MACRO_ENV_FDT_SRC_USDHCI)"\0"                  \
-+	"fdt_overlay_load2ram="__stringify(MACRO_ENV_FDT_LOAD_OVERLAY_BASE)"\0"
-+
-+#endif  /* CONFIG_OF_LIBFDT_OVERLAY */
-+
-+
-+
-+#define ENV_RAMFS                                                     \
-+	"ramfs_use=0\0"                                                   \
-+	"ramfs_device_id="__stringify(ENV_SYS_MMC_ENV_DEV)"\0"            \
-+	"ramfs_partition="__stringify(ENV_SYS_MMC_RAMFS_PART)"\0"      \
-+	"ramfs_loadaddr="__stringify(ENV_RAMFS_LOADADDR)"\0"              \
-+	"ramfs_file="__stringify(ENV_RAMFS_FILENAME)"\0"                                          \
-+	"ramfs_load_usdhci2ram="__stringify(MACRO_ENV_RAMFS_SRC_USDHCI)"\0"       \
-+	"ramfs_load_usb2ram="__stringify(MACRO_ENV_RAMFS_SRC_USB)"\0"             \
-+	"ramfs_load_eth2ram="__stringify(MACRO_ENV_RAMFS_SRC_TFTP)"\0"            \
-+	"ramfs_load2ram="__stringify(MACRO_ENV_RAMFS_SRC_USDHCI)"\0"
-+
-+
-+#define ENV_ROOT                                                      \
-+	"root_device_id="__stringify(ENV_ROOT_DEV_ID)"\0"                 \
-+	"root_partition="__stringify(ENV_SYS_MMC_ROOTFS_PART)"\0"              \
-+	"root_load_usdhci="__stringify(MACRO_ENV_FS_SRC_USDHCI)"\0"               \
-+	"root_load_usb="__stringify(MACRO_ENV_FS_SRC_USB)"\0"                     \
-+	"root_load_eth="__stringify(MACRO_ENV_FS_SRC_NFS)"\0"                     \
-+	"run_from_nfs=0\0"  \
-+	"root_mount="__stringify(MACRO_ENV_FS_SRC_USDHCI)"\0"
-+
-+
-+#define ENV_NETWORK                                                   \
-+	"ipaddr="__stringify(CONFIG_IPADDR)"\0"                           \
-+	"netmask=255.255.255.0\0"                                         \
-+	"eth_if=0\0"                                                      \
-+	"nfs_use_dhcp=0\0"                                                \
-+	"nfs_use_dhcp_autopath=0\0"                                       \
-+	"ipsetup=setenv ipaddr ${ipaddr}; setenv serverip ${serverip};\0" \
-+	"set_remote_rootfs="__stringify(MACRO_SET_REMOTE_ROOTFS)"\0"      \
-+	"set_ip="__stringify(MACRO_SET_IP)"\0"                            \
-+	"nfs_ip_client="__stringify(CONFIG_IPADDR)"\0"                    \
-+	"nfs_ip_server="__stringify(CONFIG_SERVERIP)"\0"                  \
-+	"nfs_netmask="__stringify(CONFIG_NETMASK)"\0"                     \
-+	"nfs_path="__stringify(DEF_NFS_PATH)"\0"
-+
-+
-+
-+#ifndef CONFIG_OF_LIBFDT_OVERLAY
-+
-+#define ENV_CMD_SET_BOOT                                              \
-+	"if test \"${bootusb}\" = \"true\"; then " \
-+	"  for fstype in fat ext2; do " \
-+	"   if ${fstype}load usb 0:1 0x00500000" __stringify(ENV_UENV_FILE_NAME)"; then " \
-+	"     env import -t 0x00500000 600; run usb_boot; fi; " \
-+	"  done; " \
-+	"fi; " \
-+	"mmc dev ${bootscript_device_id}; "                               \
-+	"if mmc rescan; then "                                            \
-+		"if run bootscript_load_usdhci2ram; then "                    \
-+			"echo ==> Running bootscript mode... ; "			      \
-+			" source "__stringify(ENV_BOOTSCRIPT_LOADADDR)"; "                                              \
-+		"fi; "                                                        \
-+	"fi; "                                                            \
-+	"echo ==> Running in Normal Mode... ; "							  \
-+	"run bootargs_base; "                                          	  \
-+	"run kernel_load2ram; "                                           \
-+	"run fdt_load2ram; "                                              \
-+	"run root_mount; "                                                \
-+	"run bootargs_base; "                                             \
-+	"if test ${ramfs_use} = 1; then "                                 \
-+		" run ramfs_load2ram; "                                       \
-+		__stringify(DEF_NFS_PATH)" ${kernel_loadaddr} ${ramfs_loadaddr} ${fdt_loadaddr}; "\
-+	"else "                                                           \
-+		__stringify(DEF_NFS_PATH)" ${kernel_loadaddr} - ${fdt_loadaddr}; "               \
-+	"fi\0"
-+
-+#else
-+
-+#define ENV_CMD_SET_BOOT                                              \
-+	"if test \"${bootusb}\" = \"true\"; then " \
-+	"  for fstype in fat ext2; do " \
-+	"   if ${fstype}load usb 0:1 0x00500000" __stringify(ENV_UENV_FILE_NAME)"; then " \
-+	"     env import -t 0x00500000 600; run usb_boot; fi; " \
-+	"  done; " \
-+	"fi; " \
-+	"mmc dev ${bootscript_device_id}; "                               \
-+	"if mmc rescan; then "                                            \
-+		"if run bootscript_load_usdhci2ram; then "                    \
-+			"echo ==> Running bootscript mode... ; "			      \
-+			" source "__stringify(ENV_BOOTSCRIPT_LOADADDR)"; "                                              \
-+		"fi; "                                                        \
-+	"fi; "                                                            \
-+	"echo ==> Running in Normal Mode... ; "							  \
-+	"run bootargs_base; "                                          	  \
-+	"run kernel_load2ram; "                                           \
-+	"run fdt_load2ram; "                                              \
-+	"run fdt_overlay_load2ram; "                                      \
-+	"run root_mount; "                                                \
-+	"run bootargs_base; "                                             \
-+	"if test ${ramfs_use} = 1; then "                                 \
-+		" run ramfs_load2ram; "                                       \
-+		__stringify(ENV_BOOT_TYPE)" ${kernel_loadaddr} ${ramfs_loadaddr} ${fdt_loadaddr}; "\
-+	"else "                                                           \
-+		__stringify(ENV_BOOT_TYPE)" ${kernel_loadaddr} - ${fdt_loadaddr}; "                  \
-+	"fi\0"
-+
-+#endif  /* CONFIG_OF_LIBFDT_OVERLAY */
-+
-+#ifndef CONFIG_PREBOOT
-+#define CONFIG_PREBOOT
-+#endif
-+
-+
-+#define ENV_PREBOOT "preboot=echo Start boot...\0"
-+
-+#undef CONFIG_EXTRA_ENV_SETTINGS
-+#define CONFIG_EXTRA_ENV_SETTINGS                                     \
-+	ENV_COMMON                                                        \
-+	ENV_ARGS_BASE                                                     \
-+	ENV_NETWORK                                                       \
-+	ENV_BOOTSCRIPT                                                    \
-+	ENV_KERNEL                                                        \
-+	ENV_FDT                                                           \
-+	ENV_RAMFS                                                         \
-+	ENV_ROOT                                                          \
-+	ENV_PREBOOT                                                       \
-+	"bootcmd=" ENV_CMD_SET_BOOT "\0"
-+
-+
-+#endif     /*  __SECO_ENVIRONMENT_H  */
-diff --git a/include/configs/seco_imx8m_common.h b/include/configs/seco_imx8m_common.h
+diff --git a/include/configs/seco_c61_distro.h b/include/configs/seco_c61_distro.h
 new file mode 100755
-index 0000000000..b8acebd06f
+index 0000000000..430ccf654b
 --- /dev/null
-+++ b/include/configs/seco_imx8m_common.h
-@@ -0,0 +1,127 @@
-+/*
-+ * (C) Copyright 2015 Seco
-+ *
-+ * Author: Davide Cardillo <davide.cardillo@seco.com>
-+ *
-+ * SPDX-License-Identifier:     GPL-2.0+
++++ b/include/configs/seco_c61_distro.h
+@@ -0,0 +1,112 @@
++/* SPDX-License-Identifier: GPL-2.0+
++ * (C) Copyright 2014
++ * NVIDIA Corporation <www.nvidia.com>
++ * Copyright 2014 Red Hat, Inc.
++ * Copyright 2022 Seco
 + */
 +
-+
-+#ifndef __MX8MQSECO_COMMON_CONFIG_H
-+#define __MX8MQSECO_COMMON_CONFIG_H
-+
-+
-+/* ____________________________________________________________________________
-+  |                                                                            |
-+  |                                   ENVIRONMENT                              |
-+  |____________________________________________________________________________|
-+*/
-+
-+#define SYS_MMC_IMG_LOAD_PART   1
-+
-+#define ROOT_DEV_ID		0
-+#define ROOT_PARTITION		3
-+#define KERNEL_LOADADDR		 CONFIG_SYS_LOAD_ADDR /* 0x40280000 */
-+#define FDT_LOADADDR	 	         0x43000000
-+#define FDT_OVERLAY_LOADADDR_BASE	 0x44000000
-+#define FDT_OVERLAY_LOADADDR_OFFSET     0x01000000
-+#define FDT_RESIZE                      0x60000
-+
-+#define BOOTARGS_BASE  "setenv bootargs ${console_interface} ${memory} ${cpu_freq} ${videomode} ${options} ${root_dev}"
-+
-+#define ENV_COMMON                                        \
-+	"bootdelay="__stringify(CONFIG_BOOTDELAY)"\0"            \
-+	"stdin=serial\0"                                         \
-+	"stdout=serial\0"                                        \
-+	"stderr=serial\0"
-+
-+#define ENV_BOOTARG_BASE                                                                               \
-+	"console_interface='console="CONSOLE_DEV"," __stringify(CONFIG_BAUDRATE)",earlycon=ec_imx6q,0x30890000,115200'\0"                \
-+	"bootargs_base="BOOTARGS_BASE"\0"	\
-+	"options=drm_kms_helper.edid_firmware=edid/1920x1080.bin\0"
-+
-+#define ENV_KERNEL                                                                                                                   \
-+	"kernel_device_id="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                                                                          \
-+        "kernel_partition="__stringify(SYS_MMC_IMG_LOAD_PART)"\0"                                                                    \
-+        "kernel_loadaddr="__stringify(KERNEL_LOADADDR)"\0"                                                                                  \
-+	"kernel_file=Image\0"                                                                                                              \
-+	"kernel_load=mmc dev ${kernel_device_id}; fatload mmc ${kernel_device_id}:${kernel_partition} ${kernel_loadaddr} ${kernel_file}\0"
-+
-+
-+#define ENV_FDT \
-+	"fdt_device_id="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
-+	"fdt_partition="__stringify(SYS_MMC_IMG_LOAD_PART)"\0" \
-+	"fdt_loadaddr="__stringify(FDT_LOADADDR)"\0" \
-+	"fdt_file=" DEFAULT_FDT_FILE "\0" \
-+	"fdt_high=0xffffffff\0" \
-+	"fdt_resize="__stringify(FDT_RESIZE)"\0" \
-+	"fdt_load=mmc dev ${fdt_device_id}; fatload mmc ${fdt_device_id}:${fdt_partition} ${fdt_loadaddr} ${fdt_file}\0"
-+
-+#ifdef CONFIG_OF_LIBFDT_OVERLAY
-+
-+#define ENV_FDT_OVERLAY \
-+	"fdt_overlay_device_id="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
-+	"fdt_overlay_partition="__stringify(SYS_MMC_IMG_LOAD_PART)"\0" \
-+	"fdt_overlay_file=" DEFAULT_FDT_OVERLAY_FILE "\0" \
-+	"fdt_overlay_loadaddr="__stringify(FDT_OVERLAY_LOADADDR_BASE)"\0" \
-+	"fdt_overlay_load=mmc dev ${fdt_overlay_device_id}; fatload mmc ${fdt_overlay_device_id}:${fdt_overlay_partition} ${fdt_overlay_loadaddr} ${fdt_overlay_file}\0"
-+
-+#define FDT_OVERLAY_APPLY \
-+	"run fdt_overlay_load; " \
-+	"fdt addr ${fdt_loadaddr}; fdt resize ${fdt_resize}; " \
-+	"fdt apply ${fdt_overlay_loadaddr}; "
-+
-+#else
-+#define FDT_OVERLAY_APPLY
-+#define ENV_FDT_OVERLAY
-+
-+#endif  /* CONFIG_OF_LIBFDT_OVERLAY */
-+
-+#define ENV_ROOT                                                                               \
-+	"root_device_id="__stringify(ROOT_DEV_ID)"\0"                                              \
-+	"root_partition="__stringify(ROOT_PARTITION)"\0"                                           \
-+	"root_set_dev=setenv root_dev root=/dev/mmcblk${root_device_id}p${root_partition} rootwait rw\0"  \
-+	"root_add_env=setenv bootargs ${bootargs} ${root_dev}\0"
-+
-+
-+#define ENV_VIDEO                                          \
-+	"video_lvds1=video=mxcfb1:dev=ldb,LDB-WVGA,if=RGB666\0"       \
-+	"video_lvds2=video=mxcfb2:dev=ldb,LDB-WVGA,if=RGB666\0"       \
-+	"video_hdmi=video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24\0"   \
-+	"videomode=video=mxcfb0:dev=hdmi,1920x1080M@60\0"
-+
-+
-+#define CMD_SET_BOOT                                         \
-+	"run bootargs_base; "                                           \
-+	"if test \"${run_from_tftp}\" = \"1\"; then "                    \
-+		"run ipsetup;"  \
-+	"fi;"                                                           \
-+	"if test \"${run_from_nfs}\" = \"0\"; then "                    \
-+		"echo Running in Normal Mode... ; "                         \
-+	"else "                                                         \
-+		"echo Running in Remote... ; "                              \
-+		"run set_ip; "                                              \
-+	"fi;"                                                           \
-+	"run root_set_dev; "                                            \
-+	"run root_add_env; "                                            \
-+	"run kernel_load; "                                             \
-+	"run fdt_load; "                                                \
-+	"if test \"${run_overlay}\" = \"0\"; then "                    \
-+                "echo Running in Normal Mode... ; "                         \
-+        "else "                                                         \
-+                "echo Apply overlay... ; "                              \
-+                "run overlay_setup;"   \
-+        "fi;"				\
-+	"booti ${kernel_loadaddr} - ${fdt_loadaddr}"
-+
-+
-+#define CONFIG_EXTRA_ENV_SETTINGS        \
-+	ENV_COMMON                       \
-+	ENV_BOOTARG_BASE                 \
-+	ENV_KERNEL                       \
-+	ENV_FDT                          \
-+	ENV_FDT_OVERLAY                  \
-+	ENV_ROOT                         \
-+	"bootcmd=" CMD_SET_BOOT "\0"
-+
-+#endif /* SECOCONFIG COMMON */
-diff --git a/include/configs/seco_imx8mm_c61.h b/include/configs/seco_imx8mm_c61.h
-new file mode 100644
-index 0000000000..668201b3ef
---- /dev/null
-+++ b/include/configs/seco_imx8mm_c61.h
-@@ -0,0 +1,352 @@
-+/* SPDX-License-Identifier: GPL-2.0+ */
-+/*
-+ * Copyright 2019 NXP
-+ */
-+
-+#ifndef __IMX8MM_EVK_H
-+#define __IMX8MM_EVK_H
-+
-+#include <linux/sizes.h>
-+#include <asm/arch/imx-regs.h>
-+#include "imx_env.h"
-+#include "seco_imx8m_common.h"
-+
-+#define CONFIG_SPL_MAX_SIZE		       (148 * 1024)
-+#define CONFIG_SYS_MONITOR_LEN		SZ_512K
-+#define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
-+#define CONFIG_SYS_UBOOT_BASE	\
-+	(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
-+
-+#define APX_WDT_TRIGGER_BASE                  GPIO3_BASE_ADDR
-+#define APX_WDT_TRIGGER_NUM                   21
-+
-+#define APX_WDT_ENABLE_BASE                   GPIO3_BASE_ADDR
-+#define APX_WDT_ENABLE_NUM                    22
-+
-+
-+/* eMMC uSD Configuration */
-+#define BOOT_ID_EMMC 0
-+#define ROOT_ID_EMMC 0
-+#define BOOT_ID_USD  1
-+#define ROOT_ID_USD  1
-+
-+#ifdef CONFIG_SPL_BUILD
-+#define CONFIG_SPL_STACK		0x920000
-+#define CONFIG_SPL_BSS_START_ADDR	0x910000
-+#define CONFIG_SPL_BSS_MAX_SIZE	SZ_8K	/* 8 KB */
-+#define CONFIG_SYS_SPL_MALLOC_START	0x42200000
-+#define CONFIG_SYS_SPL_MALLOC_SIZE	SZ_512K	/* 512 KB */
-+
-+/* malloc f used before GD_FLG_FULL_MALLOC_INIT set */
-+#define CONFIG_MALLOC_F_ADDR		0x912000
-+/* For RAW image gives a error info not panic */
-+#define CONFIG_SPL_ABORT_ON_RAW_IMAGE
-+
-+#if defined(CONFIG_NAND_BOOT)
-+#define CONFIG_SPL_NAND_SUPPORT
-+#define CONFIG_SPL_DMA
-+#define CONFIG_SPL_NAND_MXS
-+#define CONFIG_SPL_NAND_BASE
-+#define CONFIG_SPL_NAND_IDENT
-+#define CONFIG_SYS_NAND_U_BOOT_OFFS 	0x4000000 /* Put the FIT out of first 64MB boot area */
-+
-+/* Set a redundant offset in nand FIT mtdpart. The new uuu will burn full boot image (not only FIT part) to the mtdpart, so we check both two offsets */
-+#define CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND \
-+	(CONFIG_SYS_NAND_U_BOOT_OFFS + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512 - 0x8400)
-+#endif
-+
-+#endif
-+
-+#define CONFIG_CMD_READ
-+#define CONFIG_SERIAL_TAG
-+#define CONFIG_FASTBOOT_USB_DEV 0
-+
-+#define CONFIG_REMAKE_ELF
-+/* ENET Config */
-+/* ENET1 */
-+#if defined(CONFIG_FEC_MXC)
-+#define CONFIG_ETHPRIME                 "FEC"
-+#define PHY_ANEG_TIMEOUT 20000
-+
-+#define CONFIG_FEC_MXC_PHYADDR          9
-+#define FEC_QUIRK_ENET_MAC
-+
-+#define IMX_FEC_BASE			 0x30BE0000
-+#endif
-+
-+#ifdef CONFIG_NAND_BOOT
-+#define MFG_NAND_PARTITION "mtdparts=gpmi-nand:64m(nandboot),16m(nandfit),32m(nandkernel),16m(nanddtb),8m(nandtee),-(nandrootfs)"
-+#endif
-+
-+/* Link Definitions */
-+
-+#define CONFIG_SYS_INIT_RAM_ADDR        0x40000000
-+#define CONFIG_SYS_INIT_RAM_SIZE        0x200000
-+#define CONFIG_SYS_INIT_SP_OFFSET \
-+	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
-+#define CONFIG_SYS_INIT_SP_ADDR \
-+	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
-+
-+#define CONFIG_ENV_OVERWRITE
-+#if defined(CONFIG_ENV_IS_IN_SPI_FLASH)
-+#define CONFIG_ENV_SPI_BUS		CONFIG_SF_DEFAULT_BUS
-+#define CONFIG_ENV_SPI_CS		CONFIG_SF_DEFAULT_CS
-+#define CONFIG_ENV_SPI_MODE		CONFIG_SF_DEFAULT_MODE
-+#define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
-+#endif
-+#define CONFIG_SYS_MMC_ENV_DEV          0   /* USDHC3 */
-+#define CONFIG_MMCROOT			"/dev/mmcblk0p3"  /* USDHC3 */
-+
-+#define CONFIG_SYS_SDRAM_BASE           0x40000000
-+#define PHYS_SDRAM                      0x40000000
-+#define PHYS_SDRAM_SIZE                 PHYS_DRAM_IS_3GB /* 2GB DDR */
-+#define PHYS_DRAM_IS_1GB                0x40000000
-+#define PHYS_DRAM_IS_2GB                0x80000000
-+#define PHYS_DRAM_IS_3GB                0xc0000000
-+#define PHYS_DRAM_IS_4GB                0x100000000
-+#define PHYS_SDRAM_2                    0x100000000
-+
-+#ifdef CONFIG_DRAM_BANKS_2
-+#define PHYS_SDRAM_2_SIZE               0x40000000 /* 1GB */
-+#endif
-+
-+
-+#define CONSOLE_DEV			"ttymxc1"
-+#define DEFAULT_FDT_FILE	 	"seco-imx8mm-c61.dtb"
-+
-+/* Overlay Support */
-+#define DEFAULT_FDT_OVERLAY_FILE	"seco-imx8mm-c61-video-sn65dsi84.dtbo"
-+
-+#define CONFIG_MXC_UART_BASE		UART2_BASE_ADDR
-+
-+/* Monitor Command Prompt */
-+#define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
-+#define CONFIG_SYS_CBSIZE		2048
-+#define CONFIG_SYS_MAXARGS		64
-+#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
-+#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-+					sizeof(CONFIG_SYS_PROMPT) + 16)
-+
-+#define CONFIG_IMX_BOOTAUX
-+
-+/* USDHC */
-+#ifdef CONFIG_TARGET_SECO_IMX8MM_DDR4
-+#define CONFIG_SYS_FSL_USDHC_NUM       1
-+#else
-+#define CONFIG_SYS_FSL_USDHC_NUM       2
-+#endif
-+#define CONFIG_SYS_FSL_ESDHC_ADDR      0
-+
-+#define SYS_MMC_IMG_LOAD_PART	        1
-+
-+#ifdef CONFIG_FSL_FSPI
-+#define FSL_FSPI_FLASH_SIZE            SZ_32M
-+#define FSL_FSPI_FLASH_NUM             1
-+#define FSPI0_BASE_ADDR                0x30bb0000
-+#define FSPI0_AMBA_BASE                0x0
-+#define CONFIG_FSPI_QUAD_SUPPORT
-+
-+#define CONFIG_SYS_FSL_FSPI_AHB
-+#endif
-+
-+#ifdef CONFIG_NAND_MXS
-+#define CONFIG_CMD_NAND_TRIMFFS
-+
-+/* NAND stuff */
-+#define CONFIG_SYS_MAX_NAND_DEVICE     1
-+#define CONFIG_SYS_NAND_BASE           0x20000000
-+#define CONFIG_SYS_NAND_5_ADDR_CYCLE
-+#define CONFIG_SYS_NAND_ONFI_DETECTION
-+#define CONFIG_SYS_NAND_USE_FLASH_BBT
-+#endif /* CONFIG_NAND_MXS */
-+
-+#define CONFIG_SYS_I2C_SPEED		100000
-+
-+/* USB configs */
-+#ifndef CONFIG_SPL_BUILD
-+#define CONFIG_USBD_HS
-+
-+#define CONFIG_CMD_USB_MASS_STORAGE
-+#define CONFIG_USB_FUNCTION_MASS_STORAGE
-+
-+#endif
-+
-+#define CONFIG_USB_GADGET_VBUS_DRAW 2
-+
-+#define CONFIG_MXC_USB_PORTSC  (PORT_PTS_UTMI | PORT_PTS_PTW)
-+#define CONFIG_USB_MAX_CONTROLLER_COUNT         2
-+
-+#ifdef CONFIG_DM_VIDEO
-+#define CONFIG_VIDEO_MXS
-+#define CONFIG_VIDEO_LOGO
-+#define CONFIG_SPLASH_SCREEN
-+#define CONFIG_SPLASH_SCREEN_ALIGN
-+#define CONFIG_CMD_BMP
-+#define CONFIG_BMP_16BPP
-+#define CONFIG_BMP_24BPP
-+#define CONFIG_BMP_32BPP
-+#define CONFIG_VIDEO_BMP_RLE8
-+#define CONFIG_VIDEO_BMP_LOGO
-+#endif
++#ifndef __CONFIG_DISTRO_C61_H
++#define __CONFIG_DISTRO_C61_H
 +
 +/*DISTRO support*/
 +#ifdef CONFIG_DISTRO_DEFAULTS
@@ -4801,8 +4095,10 @@ index 0000000000..668201b3ef
 +	\
 +	"apply_dtb_overlay="                                              \
 +		"load ${devtype} ${devnum}:${distro_bootpart} "           \
-+			"${fdt_overlay_loadaddr} ${prefix}${fdt_overlay_file}; " \
-+		"fdt addr ${fdt_addr_r}; fdt resize ${fdt_resize}; "      \
++			"${fdt_overlay_loadaddr} ${prefix}${fdto_file}; " \
++		"if test ${idx} -eq 1; then "                             \
++			"fdt addr ${fdt_addr_r}; fdt resize ${fdt_resize}; " \
++		"fi; "                                                    \
 +		"fdt apply ${fdt_overlay_loadaddr}\0"                     \
 +	\
 +	"efi_dtb_prefixes=/ /dtb/ /dtb/current/\0"                        \
@@ -4817,16 +4113,19 @@ index 0000000000..668201b3ef
 +			"fi;"                                             \
 +		"done;"                                                   \
 +		"usb start; "                                             \
-+		"if test -n \"${fdt_overlay_file}\"; then "               \
-+			"for prefix in ${efi_dtb_prefixes}; do "          \
-+				"if test -e ${devtype} "                  \
-+					"${devnum}:${distro_bootpart} "   \
-+					"${prefix}${fdt_overlay_file}; then " \
-+		                                                         \
-+					"run apply_dtb_overlay; "         \
-+				"fi;"                                     \
-+			"done;"                                           \
-+		"fi;"                                                     \
++		"setexpr idx 0; "                                         \
++		"for fdto_file in ${fdt_overlay_files_all}; do "          \
++			"if test -n \"${fdto_file}\"; then "              \
++				"for prefix in ${efi_dtb_prefixes}; do "  \
++					"if test -e ${devtype} "          \
++						"${devnum}:${distro_bootpart} " \
++						"${prefix}${fdto_file}; then " \
++						"setexpr idx ${idx} + 1; " \
++						"run apply_dtb_overlay; "  \
++					"fi; "                             \
++				"done; "                                   \
++			"fi; "                                             \
++		"done;"                                                   \
 +		"run boot_efi_bootmgr;"                                   \
 +		"if test -e ${devtype} ${devnum}:${distro_bootpart} "     \
 +					"efi/boot/"BOOTEFI_NAME"; then "  \
@@ -4841,6 +4140,278 @@ index 0000000000..668201b3ef
 +#define BOOTENV
 +#endif /* CONFIG_DISTRO_DEFAULTS */
 +
++#endif /* __CONFIG_DISTRO_C61_H */
+diff --git a/include/configs/seco_imx8mm_c61.h b/include/configs/seco_imx8mm_c61.h
+new file mode 100644
+index 0000000000..f693b7e766
+--- /dev/null
++++ b/include/configs/seco_imx8mm_c61.h
+@@ -0,0 +1,336 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/* Copyright 2019 NXP
++ * Copyright 2022 Seco
++ */
++
++#ifndef __CONFIG_IMX8MM_C61_H
++#define __CONFIG_IMX8MM_C61_H
++
++#include <linux/sizes.h>
++#include <asm/arch/imx-regs.h>
++#include "imx_env.h"
++#include "seco_c61_distro.h"
++
++#define CONFIG_SPL_MAX_SIZE		       (148 * 1024)
++#define CONFIG_SYS_MONITOR_LEN		SZ_512K
++#define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
++#define CONFIG_SYS_UBOOT_BASE	\
++	(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
++
++#ifdef CONFIG_SPL_BUILD
++#define CONFIG_SPL_STACK               0x920000
++#define CONFIG_SPL_BSS_START_ADDR      0x910000
++#define CONFIG_SPL_BSS_MAX_SIZE        SZ_8K
++#define CONFIG_SYS_SPL_MALLOC_START    0x42200000
++#define CONFIG_SYS_SPL_MALLOC_SIZE     SZ_512K
++
++/* malloc f used before GD_FLG_FULL_MALLOC_INIT set */
++#define CONFIG_MALLOC_F_ADDR           0x912000
++/* For RAW image gives a error info not panic */
++#define CONFIG_SPL_ABORT_ON_RAW_IMAGE
++
++#if defined(CONFIG_NAND_BOOT)
++#define CONFIG_SPL_NAND_SUPPORT
++#define CONFIG_SPL_DMA
++#define CONFIG_SPL_NAND_MXS
++#define CONFIG_SPL_NAND_BASE
++#define CONFIG_SPL_NAND_IDENT
++#define CONFIG_SYS_NAND_U_BOOT_OFFS    0x4000000 /* Put the FIT out of first 64MB boot area */
++
++/* Set a redundant offset in nand FIT mtdpart. The new uuu will burn full boot image (not only FIT part) to the mtdpart, so we check both two offsets */
++#define CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND \
++	(CONFIG_SYS_NAND_U_BOOT_OFFS + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512 - 0x8400)
++#endif
++#endif /* CONFIG_SPL_BUILD */
++
++#define CONFIG_CMD_READ
++#define CONFIG_SERIAL_TAG
++#define CONFIG_FASTBOOT_USB_DEV        0
++
++#define CONFIG_REMAKE_ELF
++
++/* ENET Config */
++/* ENET1 */
++#if defined(CONFIG_FEC_MXC)
++#define CONFIG_ETHPRIME                "FEC"
++#define PHY_ANEG_TIMEOUT               20000
++
++#define CONFIG_FEC_MXC_PHYADDR         9
++#define FEC_QUIRK_ENET_MAC
++
++#define IMX_FEC_BASE                   0x30BE0000
++#endif
++
++#ifdef CONFIG_NAND_BOOT
++#define MFG_NAND_PARTITION "mtdparts=gpmi-nand:64m(nandboot),16m(nandfit),32m(nandkernel),16m(nanddtb),8m(nandtee),-(nandrootfs)"
++#endif
++
++/* Link Definitions */
++
++#define CONFIG_SYS_INIT_RAM_ADDR       0x40000000
++#define CONFIG_SYS_INIT_RAM_SIZE       0x200000
++#define CONFIG_SYS_INIT_SP_OFFSET \
++	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
++#define CONFIG_SYS_INIT_SP_ADDR \
++	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
++
++#define CONFIG_ENV_OVERWRITE
++#if defined(CONFIG_ENV_IS_IN_SPI_FLASH)
++#define CONFIG_ENV_SPI_BUS             CONFIG_SF_DEFAULT_BUS
++#define CONFIG_ENV_SPI_CS              CONFIG_SF_DEFAULT_CS
++#define CONFIG_ENV_SPI_MODE            CONFIG_SF_DEFAULT_MODE
++#define CONFIG_ENV_SPI_MAX_HZ          CONFIG_SF_DEFAULT_SPEED
++#endif
++
++#define CONFIG_SYS_MMC_ENV_DEV         0  /* USDHC3 */
++#define CONFIG_MMCROOT                 "/dev/mmcblk0p3"
++
++#define CONFIG_SYS_SDRAM_BASE          0x40000000
++#define PHYS_SDRAM                     0x40000000
++#define PHYS_SDRAM_SIZE                PHYS_DRAM_IS_3GB /* 2GB DDR */
++#define PHYS_DRAM_IS_1GB               0x40000000
++#define PHYS_DRAM_IS_2GB               0x80000000
++#define PHYS_DRAM_IS_3GB               0xc0000000
++#define PHYS_DRAM_IS_4GB               0x100000000
++#define PHYS_SDRAM_2                   0x100000000
++
++#ifdef CONFIG_DRAM_BANKS_2
++#define PHYS_SDRAM_2_SIZE              0x40000000 /* 1GB */
++#endif
++
++#define CONFIG_MXC_UART_BASE           UART2_BASE_ADDR
++
++/* Monitor Command Prompt */
++#define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
++#define CONFIG_SYS_CBSIZE              2048
++#define CONFIG_SYS_MAXARGS             64
++#define CONFIG_SYS_BARGSIZE            CONFIG_SYS_CBSIZE
++#define CONFIG_SYS_PBSIZE              (CONFIG_SYS_CBSIZE + \
++					sizeof(CONFIG_SYS_PROMPT) + 16)
++#define CONFIG_IMX_BOOTAUX
++
++/* USDHC */
++#ifdef CONFIG_TARGET_SECO_IMX8MM_DDR4
++#define CONFIG_SYS_FSL_USDHC_NUM       1
++#else
++#define CONFIG_SYS_FSL_USDHC_NUM       2
++#endif
++#define CONFIG_SYS_FSL_ESDHC_ADDR      0
++
++#ifdef CONFIG_FSL_FSPI
++#define FSL_FSPI_FLASH_SIZE            SZ_32M
++#define FSL_FSPI_FLASH_NUM             1
++#define FSPI0_BASE_ADDR                0x30bb0000
++#define FSPI0_AMBA_BASE                0x0
++#define CONFIG_FSPI_QUAD_SUPPORT
++#define CONFIG_SYS_FSL_FSPI_AHB
++#endif
++
++#ifdef CONFIG_NAND_MXS
++#define CONFIG_CMD_NAND_TRIMFFS
++#define CONFIG_SYS_MAX_NAND_DEVICE     1
++#define CONFIG_SYS_NAND_BASE           0x20000000
++#define CONFIG_SYS_NAND_5_ADDR_CYCLE
++#define CONFIG_SYS_NAND_ONFI_DETECTION
++#define CONFIG_SYS_NAND_USE_FLASH_BBT
++#endif
++
++#define CONFIG_SYS_I2C_SPEED           100000
++
++/* USB configs */
++#ifndef CONFIG_SPL_BUILD
++#define CONFIG_USBD_HS
++#define CONFIG_CMD_USB_MASS_STORAGE
++#define CONFIG_USB_FUNCTION_MASS_STORAGE
++#endif
++
++#define CONFIG_USB_GADGET_VBUS_DRAW    2
++#define CONFIG_MXC_USB_PORTSC  (PORT_PTS_UTMI | PORT_PTS_PTW)
++#define CONFIG_USB_MAX_CONTROLLER_COUNT    2
++
++#ifdef CONFIG_DM_VIDEO
++#define CONFIG_VIDEO_MXS
++#define CONFIG_VIDEO_LOGO
++#define CONFIG_SPLASH_SCREEN
++#define CONFIG_SPLASH_SCREEN_ALIGN
++#define CONFIG_CMD_BMP
++#define CONFIG_BMP_16BPP
++#define CONFIG_BMP_24BPP
++#define CONFIG_BMP_32BPP
++#define CONFIG_VIDEO_BMP_RLE8
++#define CONFIG_VIDEO_BMP_LOGO
++#endif
++
++#define APX_WDT_TRIGGER_BASE           GPIO3_BASE_ADDR
++#define APX_WDT_TRIGGER_NUM            21
++
++#define APX_WDT_ENABLE_BASE            GPIO3_BASE_ADDR
++#define APX_WDT_ENABLE_NUM             22
++
++#define SYS_MMC_IMG_LOAD_PART   1
++
++#define ROOT_DEV_ID             0
++#define ROOT_PARTITION          3
++#define KERNEL_LOADADDR                CONFIG_SYS_LOAD_ADDR /* 0x40280000 */
++#define FDT_LOADADDR                   0x43000000
++#define FDT_OVERLAY_LOADADDR_BASE      0x44000000
++#define FDT_OVERLAY_LOADADDR_OFFSET    0x01000000
++#define FDT_RESIZE                     0x60000
++
++/* eMMC uSD Configuration */
++#define BOOT_ID_EMMC    0
++#define ROOT_ID_EMMC    0
++#define BOOT_ID_USD     1
++#define ROOT_ID_USD     1
++
++#define CONSOLE_DEV                    "ttymxc1"
++#define DEFAULT_FDT_FILE               "seco-imx8mm-c61.dtb"
++
++/* Overlay Support */
++#define FDT_OVERLAY_FILES_ALL \
++	"seco-imx8mm-c61-video-sn65dsi84.dtbo " \
++	"seco-imx8mm-c61-video-sn65dsi86.dtbo " \
++	"seco-imx8mm-c61-ov5640.dtbo " \
++	"seco-imx8mm-c61-port1-can.dtbo " \
++	"seco-imx8mm-c61-port1-rs232.dtbo " \
++	"seco-imx8mm-c61-port1-rs485.dtbo " \
++	"seco-imx8mm-c61-port1-gpios.dtbo " \
++	"seco-imx8mm-c61-port2-can.dtbo " \
++	"seco-imx8mm-c61-port2-rs232.dtbo " \
++	"seco-imx8mm-c61-port2-rs485.dtbo " \
++	"seco-imx8mm-c61-port2-gpios.dtbo " \
++	"seco-imx8mm-c61-modem.dtbo"
++
++#define BOOTARGS_BASE  "setenv bootargs ${console_interface} ${memory} ${cpu_freq} ${videomode} ${options} ${root_dev}"
++
++#define ENV_COMMON \
++	"bootdelay="__stringify(CONFIG_BOOTDELAY)"\0" \
++	"stdin=serial\0" \
++	"stdout=serial\0" \
++	"stderr=serial\0"
++
++#define ENV_BOOTARG_BASE \
++	"console_interface='console="CONSOLE_DEV"," __stringify(CONFIG_BAUDRATE)",earlycon=ec_imx6q,0x30890000,115200'\0" \
++	"bootargs_base="BOOTARGS_BASE"\0"
++
++#define ENV_KERNEL \
++	"kernel_device_id="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
++	"kernel_partition="__stringify(SYS_MMC_IMG_LOAD_PART)"\0" \
++	"kernel_loadaddr="__stringify(KERNEL_LOADADDR)"\0" \
++	"kernel_file=Image\0" \
++	"kernel_load=mmc dev ${kernel_device_id}; fatload mmc ${kernel_device_id}:${kernel_partition} ${kernel_loadaddr} ${kernel_file}\0"
++
++
++#define ENV_FDT \
++	"fdt_device_id="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
++	"fdt_partition="__stringify(SYS_MMC_IMG_LOAD_PART)"\0" \
++	"fdt_loadaddr="__stringify(FDT_LOADADDR)"\0" \
++	"fdt_file=" DEFAULT_FDT_FILE "\0" \
++	"fdt_high=0xffffffff\0" \
++	"fdt_resize="__stringify(FDT_RESIZE)"\0" \
++	"fdt_load=mmc dev ${fdt_device_id}; fatload mmc ${fdt_device_id}:${fdt_partition} ${fdt_loadaddr} ${fdt_file}\0"
++
++#ifdef CONFIG_OF_LIBFDT_OVERLAY
++#define ENV_FDT_OVERLAY \
++	"fdt_overlay_device_id="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
++	"fdt_overlay_partition="__stringify(SYS_MMC_IMG_LOAD_PART)"\0" \
++	"fdt_overlay_files_all=" FDT_OVERLAY_FILES_ALL "\0" \
++	"fdt_overlay_loadaddr="__stringify(FDT_OVERLAY_LOADADDR_BASE)"\0"
++
++#define FDT_OVERLAY_APPLY \
++	"setexpr idx 0; " \
++	"mmc dev ${fdt_overlay_device_id}; " \
++	"for fdto_file in ${fdt_overlay_files_all}; do " \
++		"if test -n \"${fdto_file}\"; then " \
++			"if test -e mmc ${fdt_overlay_device_id}:${fdt_overlay_partition} ${fdto_file}; then " \
++				"setexpr idx ${idx} + 1; " \
++				"fatload mmc ${fdt_overlay_device_id}:${fdt_overlay_partition} ${fdt_overlay_loadaddr} ${fdto_file}; " \
++				"if test ${idx} -eq 1; then " \
++					"fdt addr ${fdt_loadaddr}; fdt resize ${fdt_resize}; " \
++				"fi;" \
++				"fdt apply ${fdt_overlay_loadaddr}; " \
++			"fi; " \
++		"fi; " \
++	"done;"
++#else
++#define ENV_FDT_OVERLAY
++#define FDT_OVERLAY_APPLY
++#endif  /* CONFIG_OF_LIBFDT_OVERLAY */
++
++#define ENV_ROOT \
++	"root_device_id="__stringify(ROOT_DEV_ID)"\0" \
++	"root_partition="__stringify(ROOT_PARTITION)"\0" \
++	"root_set_dev=setenv root_dev root=/dev/mmcblk${root_device_id}p${root_partition} rootwait rw\0" \
++	"root_add_env=setenv bootargs ${bootargs} ${root_dev}\0"
++
 +#define CONFIG_MFG_ENV_SETTINGS \
 +	MFG_ENV_SETTINGS_DEFAULT \
 +	"initrd_addr=0x43800000\0" \
@@ -4849,37 +4420,35 @@ index 0000000000..668201b3ef
 +	"sd_dev=1\0" \
 +
 +#ifdef CONFIG_EFI_LOADER
-+#define EFI_SYSTEM_PARTITION          2
++#define EFI_SYSTEM_PARTITION    2
 +#define ENV_EFI \
 +	"efi_partition="__stringify(EFI_SYSTEM_PARTITION)"\0" \
 +	"efi_file=EFI/BOOT/bootaa64.efi\0" \
 +	"efi_device_id="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 +	"efi_load=mmc dev ${efi_device_id}; fatload mmc ${efi_device_id}:${efi_partition} ${kernel_loadaddr} ${efi_file}\0"
 +
-+#undef CMD_SET_BOOT
 +#define CMD_SET_BOOT \
 +	"run bootargs_base; " \
 +	"run fdt_load; " \
 +	FDT_OVERLAY_APPLY \
 +	"echo Trying to boot via UEFI variables Boot####, BootOrder, and BootNext... ; " \
 +	"bootefi bootmgr ${fdt_loadaddr}; " \
-+	"if test $? -ne 0; then "           \
-+		"echo No entries from ubootefi.var or they are all invalid...Running directly via UEFI binary... ; "  \
++	"if test $? -ne 0; then " \
++		"echo No entries from ubootefi.var or they are all invalid...Running directly via UEFI binary... ; " \
 +		"run efi_load; " \
 +		"bootefi ${kernel_loadaddr} ${fdt_loadaddr}; " \
 +	"fi;"
 +
-+#undef CONFIG_EXTRA_ENV_SETTINGS
-+#define CONFIG_EXTRA_ENV_SETTINGS       \
++#define CONFIG_EXTRA_ENV_SETTINGS \
 +	CONFIG_MFG_ENV_SETTINGS \
 +	BOOTENV \
-+	ENV_COMMON                      \
-+	ENV_BOOTARG_BASE                \
-+	ENV_KERNEL                      \
-+	ENV_FDT                         \
-+	ENV_FDT_OVERLAY                 \
-+	ENV_ROOT                        \
-+	ENV_EFI                         \
++	ENV_COMMON \
++	ENV_BOOTARG_BASE \
++	ENV_KERNEL \
++	ENV_FDT \
++	ENV_FDT_OVERLAY \
++	ENV_ROOT \
++	ENV_EFI \
 +	"kernel_addr_r=" __stringify(KERNEL_LOADADDR) "\0" \
 +	"fdtfile=" DEFAULT_FDT_FILE "\0" \
 +	"fdt_addr_r="__stringify(FDT_LOADADDR)"\0" \
@@ -4892,20 +4461,28 @@ index 0000000000..668201b3ef
 +	"bsp_bootcmd=" CMD_SET_BOOT "\0"
 +
 +#else /*Boot environment without UEFI support*/
-+#undef CONFIG_EXTRA_ENV_SETTINGS
-+#define CONFIG_EXTRA_ENV_SETTINGS           \
++#define CMD_SET_BOOT \
++	"run bootargs_base; " \
++	"run root_set_dev; " \
++	"run root_add_env; " \
++	"run kernel_load; " \
++	"run fdt_load; " \
++	FDT_OVERLAY_APPLY \
++	"booti ${kernel_loadaddr} - ${fdt_loadaddr}"
++
++#define CONFIG_EXTRA_ENV_SETTINGS \
 +	CONFIG_MFG_ENV_SETTINGS \
-+	ENV_COMMON                       \
-+	ENV_BOOTARG_BASE                 \
-+	ENV_KERNEL                       \
-+	ENV_FDT                          \
-+	ENV_FDT_OVERLAY                  \
-+	ENV_ROOT                         \
-+	"bootcmd=" CMD_SET_BOOT "\0"
++	ENV_COMMON \
++	ENV_BOOTARG_BASE \
++	ENV_KERNEL \
++	ENV_FDT \
++	ENV_FDT_OVERLAY \
++	ENV_ROOT \
++	"bsp_bootcmd=" CMD_SET_BOOT "\0"
 +
-+#endif /*CONFIG_EFI_SECURE_BOOT*/
++#endif /* CONFIG_EFI_LOADER */
 +
-+#endif
++#endif /* __CONFIG_IMX8MM_C61_H */
 diff --git a/include/configs/imx_env.h b/include/configs/imx_env.h
 new file mode 100644
 index 0000000000..de4636d1da

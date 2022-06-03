@@ -19,10 +19,10 @@
 bootloader --ptable gpt --configfile="grub-efi.cfg"
 
 part u-boot --source rawcopy --sourceparams="file=${UBOOT_BINARY}" --no-table --align 1
-part --source bootimg-partition --fstype=vfat --label x-boot --align 4096 --fixed-size ${BOOT_PARTITION_SIZE} --active --offset 4096
+part --source bootimg-partition --fstype=vfat --label ${BOOT_PARTITION_LABEL} --align 4096 --fixed-size ${BOOT_PARTITION_SIZE} --active --offset 4096
 part --source bootimg-efi-trust --sourceparams="loader=${EFI_PROVIDER}" --part-type C12A7328-F81F-11D2-BA4B-00A0C93EC93B --fstype=vfat --align 4096
 ${WIC_ROOTA_PARTITION}
 ${WIC_ROOTB_PARTITION}
-${WIC_DEVICEDATA_PARTITION}
+${WIC_DEVDATA_PARTITION}
 ${WIC_SYSDATA_PARTITION}
 ${WIC_APPDATA_PARTITION}

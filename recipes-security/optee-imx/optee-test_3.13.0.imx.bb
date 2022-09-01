@@ -6,7 +6,7 @@ HOMEPAGE = "http://www.optee.org/"
 LICENSE = "BSD-2-Clause & GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=daa2bcccc666345ab8940aab1315a4fa"
 
-DEPENDS = "python3-pycrypto-native python3-pycryptodomex-native optee-os optee-client openssl"
+DEPENDS = "python3-pycryptodomex-native optee-os optee-client openssl"
 
 SRCBRANCH = "lf-5.10.y_2.0.0"
 

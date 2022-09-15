@@ -4319,7 +4319,7 @@ index 0000000000..f693b7e766
 +#define SYS_MMC_IMG_LOAD_PART   1
 +
 +#define ROOT_DEV_ID             0
-+#define ROOT_PARTITION          3
++#define ROOT_PARTITION          2
 +#define KERNEL_LOADADDR                CONFIG_SYS_LOAD_ADDR /* 0x40280000 */
 +#define FDT_LOADADDR                   0x43000000
 +#define FDT_OVERLAY_LOADADDR_BASE      0x44000000

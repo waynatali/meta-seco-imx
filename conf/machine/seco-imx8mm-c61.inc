@@ -75,6 +75,7 @@ PREFERRED_VERSION_optee-test:mx8-nxp-bsp   = "3.13.0.imx"
 OPTEE_BIN_EXT = "8mm"
 
 EFI_PROVIDER = "grub-efi"
+IMAGE_EFI_BOOT_FILES = "${@make_dtb_boot_files(d)}"
 
 IMAGE_INSTALL:append = " \
 	alsa-utils \

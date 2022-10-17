@@ -9,14 +9,14 @@
 # with grub-efi loader
 #
 #Disk layout:
-#  -- -------- --------- --------- --------- ------------ ------------ ---
-# |  |   ESP   | x-sys-a | x-sys-b | x-dev-data | x-sys-data | x-app-data |
-#  -- -------- --------- --------- --------- ------------ ------------ ---
+#  -- ------- --------- --------- ------------ ------------ ------------
+# |  |  ESP  | x-sys-a | x-sys-b | x-dev-data | x-sys-data | x-app-data |
+#  -- ------- --------- --------- ------------ ------------ ------------
 # ^  ^
 # |  |
 # 0  4096KiB
 
-bootloader --ptable gpt --timeout=${WIC_BOOTLOADER_TIMEOUT} --append=" rootwait rootfstype=${ROOT_FSTYPE} "
+bootloader --configfile="${DEPLOY_DIR_IMAGE}/grub.cfg" --ptable gpt --timeout=${WIC_BOOTLOADER_TIMEOUT} --append=" rootwait rootfstype=${ROOT_FSTYPE} "
 
 part u-boot --source rawcopy --sourceparams="file=${UBOOT_BINARY}" --no-table --align 1
 part --source bootimg-efi --sourceparams="loader=${EFI_PROVIDER}" --label ${BOOT_PARTITION_LABEL} --active --align 4096 --offset 4096

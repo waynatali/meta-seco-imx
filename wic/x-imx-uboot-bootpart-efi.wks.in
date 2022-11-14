@@ -19,7 +19,7 @@
 bootloader --configfile="${DEPLOY_DIR_IMAGE}/grub.cfg" --ptable gpt --timeout=${WIC_BOOTLOADER_TIMEOUT} --append=" rootwait rootfstype=${ROOT_FSTYPE} "
 
 part u-boot --source rawcopy --sourceparams="file=${UBOOT_BINARY}" --no-table --align 1
-part --source bootimg-efi --sourceparams="loader=${EFI_PROVIDER}" --label ${BOOT_PARTITION_LABEL} --active --align 4096 --offset 4096
+part --source bootimg-efi --sourceparams="loader=${EFI_PROVIDER}" --label ${BOOT_PARTITION_LABEL} --active --part-type C12A7328-F81F-11D2-BA4B-00A0C93EC93B --align 4096 --offset 4096
 ${WIC_ROOTA_PARTITION}
 ${WIC_ROOTB_PARTITION}
 ${WIC_DEVDATA_PARTITION}
